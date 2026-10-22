@@ -16,14 +16,14 @@ su nota del proyecto es 0.0.
 
 | Nombre completo | Código | Correo institucional | Usuario de GitHub |
 |---|---|---|---|
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
+| Paula Bonilla Leon  | 9038204 | paula1905@javerianacali.edu.co | paulabonillaleon-ctrl |
+|Jerónimo Hurtado Mora  | 9038219 | Jhurtadom@javerianacali.edu.co | jhurtadomora |
+| Juan Manuel Paredes Betancourt | 9034283 | juanmaparedesb@javerianacali.edu.co | JuanManuelParedes |
 
-**Escenario escogido:** (A inventario / B frecuencias / C turnos / D índice)
+**Escenario escogido:** A - Inventario 
 
-- Estructura escrita desde cero:
-- Estructura de la biblioteca contra la que se compara:
+- Estructura escrita desde cero: Lista Enlazada simple y Tablas Hash
+- Estructura de la biblioteca contra la que se compara: std::forward_list y std::unordered_map
 
 ## Lo primero
 
