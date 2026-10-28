@@ -90,3 +90,23 @@ bool Lista::reponer(long codigo, int cantidad){
   }
   return encontrado;
 }
+
+bool Lista::eliminar(long codigo){
+  Nodo* anterior = nullptr;
+  Nodo* muerto = cabeza;
+  while (muerto != nullptr && muerto->dato.codigo != codigo) {
+    anterior = muerto;
+    muerto = muerto->siguiente;
+  }
+  bool encontrado = (muerto != nullptr);
+  if (encontrado) {
+    if (anterior == nullptr) {               // equivale a p == 0
+      cabeza = cabeza->siguiente;
+    } else {                                 // equivale a anterior = nodoEn(p - 1)
+      anterior->siguiente = muerto->siguiente;
+    }
+    free(muerto);
+    n = n - 1;
+  }
+  return encontrado;
+}
