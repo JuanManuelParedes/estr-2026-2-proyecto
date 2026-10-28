@@ -1,7 +1,7 @@
 # Compilación del proyecto. Ajuste FUENTES con los archivos que escriba.
 CC      = g++
 CFLAGS  = -Wall -Wextra -O2
-FUENTES = principal.cpp
+FUENTES = principal.cpp lista.cpp
 PROGRAMA = proyecto
 
 all: $(PROGRAMA)
