@@ -70,14 +70,18 @@ void Lista::listar() const{
 // Si el codigo esta, copia el producto en salida y devuelve true; si no,
 // devuelve false y deja salida como estaba. No modifica la lista.
 // Costo: el de buscar, O(n); la copia del producto es de tamano acotado.
-bool Lista::consultar(long codigo, Producto& salida) const{
+bool Lista::consultar(long codigo) const {
   Nodo* nodo = buscar(codigo);
   bool encontrado = (nodo != nullptr);
   if (encontrado) {
-    salida = nodo->dato;
+    printf("%ld %s %d\n", nodo->dato.codigo, nodo->dato.nombre,
+           nodo->dato.cantidad);
+  } else {
+    puts("no existe");
   }
   return encontrado;
 }
+
 
 // Si el codigo esta, suma cantidad a las existencias y devuelve true; si no,
 // devuelve false y NO crea ningun producto.
