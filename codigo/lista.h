@@ -24,6 +24,7 @@ class Lista {
   int n;   // número de artículos
  
   public:
+  
   Lista(){
     cabeza = nullptr;
     n = 0;
@@ -41,6 +42,8 @@ class Lista {
   Nodo* buscar(long codigo) const;
   bool consultar(long codigo, Producto& salida) const;
   bool reponer(long codigo, int cantidad);
+  bool eliminar(long codigo);
+
 };
 
 #endif
