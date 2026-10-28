@@ -126,10 +126,15 @@ El [índice oficial](https://mitp-content-server.mit.edu/books/content/sectbyfn/
 permite verificar la numeración; no sustituye la lectura del capítulo.
 **Pendiente:** confirmar que esta es la edición del texto guía que utilizará el grupo.
 
-Apoyo consultado: ChatGPT/Codex, sesión del 22 de octubre de 2026, para revisar
-los requisitos y proponer un borrador de explicación y costos. Paula y el
-grupo deben revisar el contenido y contrastarlo con el texto guía y con su
+Sesión del 22 de octubre de 2026, para revisar
+los requisitos y proponer un borrador de explicación y costos. Paula y el grupo deben revisar el contenido y contrastarlo con el texto guía y con su
 implementación.
+
+Sesión del 27 de octubre de 2026, para
+proponer una primera versión de `buscar`, `consultar` y `reponer`
+(`codigo/lista_busqueda.cpp`), del caso funcional 2 y de un banco local de
+pruebas. Paula revisó el código y lo contrastó con las restricciones del
+enunciado.
 
 ## 4. Qué piensan medir
 
@@ -146,7 +151,7 @@ El caso 1 supone la inserción al principio propuesta en la sección 3.
 | Caso | Situación de la tienda | Archivos de entrada y salida esperada | Salida obtenida con el programa del grupo |
 |---|---|---|---|
 | Funcional 1 | Registrar productos, listar existencias y rechazar un código repetido. | `agregar_listar.in` y `agregar_listar.out`, en `datos/`. | Pendiente de ejecutar cuando esté implementado el programa completo. |
-| Funcional 2 | Consultar existencias y sumar mercancía recibida; verificar códigos ausentes. | `persona2_consultar_reponer.in` y `persona2_consultar_reponer.out`, en `datos/`. | Pendiente con el programa completo. El banco auxiliar produjo la salida esperada; el detalle aparece debajo. |
+| Funcional 2 | Consultar existencias y sumar mercancía recibida; verificar códigos ausentes. | `consultar_reponer.in` y `consultar_reponer.out`, en `datos/`. | Pendiente con el programa completo. El banco auxiliar produjo la salida esperada; el detalle aparece debajo del caso. |
 | Funcional 3 | Retirar productos del inventario y comprobar que ya no se pueden consultar. | `eliminar_productos.in` y `eliminar_productos.out`, en `datos/`. | Pendiente de ejecutar cuando esté implementado el programa completo. |
 | Límite | Consultar, reponer, eliminar y listar cuando la tienda todavía no tiene productos registrados. | `inventario_vacio.in` y `inventario_vacio.out`, en `datos/`. | Pendiente de ejecutar cuando esté implementado el programa completo. |
 
@@ -229,7 +234,33 @@ no existe
 no existe
 ```
 
-**Salida obtenida:** pendiente de ejecutar con el programa completo.
+**Salida obtenida:** corrida con un banco auxiliar local, que une
+`buscar`, `consultar` y `reponer` (`codigo/lista_busqueda.cpp`) con piezas
+provisionales de `agregar`, `listar` y `eliminar`. La salida fue idéntica a
+la esperada (15 líneas, comparadas con `diff`) y la corrida con
+`-fsanitize=address,undefined` no reportó errores:
+
+```text
+ok
+ok
+ok
+1004512 arroz 20
+1004498 azucar 5
+300 sal 7
+ok
+1004498 azucar 15
+ok
+1004512 arroz 24
+ok
+300 sal 9
+no existe
+no existe
+no existe
+```
+
+Esta corrida no sustituye la del programa completo: cuando estén las piezas
+de `lista.h` y `principal.cpp`, se debe ejecutar `make pruebas` y registrar
+aquí la salida de ese programa.
 
 
 ### Caso funcional 3: eliminar productos
