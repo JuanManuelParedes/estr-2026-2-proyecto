@@ -5,6 +5,11 @@ Va en `docs/`, como los informes.
 Una entrada por sesión de trabajo, con la fecha, quién trabajó, qué se
 hizo y qué quedó pendiente. La entrada más reciente va arriba.
 
+## 2026 - 10 - 29
+- Quiénes: Juan Manuel Paredes, codigo 9034283
+- Qué hicimos: Coloque las precondiciones correctas con assert, y termine de corregir todo lo que estuviera mal en todos los archivos, para que todo tenga coherencia, ademas arreglé documentanción y las precondiciones en el informe.
+- Qué quedó pendiente: Realizar las respectivas pruebas para comprobar fallos o advertencias y agregarlo a README.md de la carpeta `docs/`.
+
 ## 2026 - 10 - 28
 - Quiénes: Juan Manuel Paredes, codigo 9034283
 - Qué hicimos: Escribí lista.h con sus respectivas funciones, junto al struct Nodo y Producto, además de colocar las funciones de agregar y listar en lista.cpp. 

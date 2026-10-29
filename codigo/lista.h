@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <cassert>
 
 struct Producto {
     long codigo;
@@ -37,6 +38,8 @@ class Lista {
         actual = siguiente;
     }
   }
+  // Lo que hace cada funcion esta en lista.cpp
+  bool vacia() const{ return n == 0; }
   int agregar(long codigo, const char* nombre, int cantidad);
   void listar() const;
   Nodo* buscar(long codigo) const;

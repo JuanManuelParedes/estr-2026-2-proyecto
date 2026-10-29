@@ -15,11 +15,13 @@ El programa se comunica de manera que el usuario le otorga unas ordenes, en dond
 
 | Operación | Qué hace | Precondición |
 |---|---|---|
-| Agregar (id, nombre, cantidad) | Añade un producto al inventario, con su id, nombre y cantidad. Responde “ok” si se añadió, o “repetido” si el artículo ya estaba. | Ninguna sobre el inventario. Que el código ya exista no impide ejecutarla: es un resultado que se informa. |
-| Eliminar (id) | Quita el artículo con ese id del inventario. Responde “ok” si se eliminó, o “no existe” si no estaba. | Ninguna. Funciona también con el inventario vacío, y responde “no existe”. |
-| Consultar (id) | Muestra el artículo con ese id: responde con su id, nombre y cantidad, o con “no existe” si no está. No modifica nada. | Ninguna. |
-| Reponer (id, cantidad) | Aumenta la cantidad de un artículo que ya está en el inventario. Responde “ok” si se repuso, o “no existe” si el artículo no está. | Ninguna sobre la presencia del artículo: si no existe, se informa y no se inserta. |
+| Agregar (id, nombre, cantidad) | Añade un producto al inventario, con su id, nombre y cantidad. Responde “ok” si se añadió, o “repetido” si el artículo ya estaba. | $\text{id} > 0$; nombre no vacío, sin espacios, de a lo sumo 63 caracteres; $\text{cantidad} > 0$	Son los datos que la estructura sabe guardar: el nombre cabe en char nombre[64] |
+| Eliminar (id) | Quita el artículo con ese id del inventario. Responde “ok” si se eliminó, o “no existe” si no estaba. | Lista no vacia e $\text{id} > 0$, ya que con la lista vacía no hay nada que quitar.  |
+| Consultar (id) | Muestra el artículo con ese id: responde con su id, nombre y cantidad, o con “no existe” si no está. No modifica nada. | Lista no vacia e $\text{id} > 0$, |
+| Reponer (id, cantidad) | Aumenta la cantidad de un artículo que ya está en el inventario. Responde “ok” si se repuso, o “no existe” si el artículo no está. | Lista no vacia, $\text{id} > 0$ y cantidad positiva ($\text{cantidad} > 0$), puesto que con cantidad negativa “reponer” restaría existencias |
 | Listar |Muestra todos los artículos del inventario, uno por línea. No modifica nada.  | Ninguna. Con el inventario vacío no muestra nada. |
+
+Si una precondición no se cumple, la estructura no se modifica. Por ejemplo, con el inventario vacío (`ELIMINAR`, `CONSULTAR` o `REPONER`), el programa responde `no existe`, como fija el enunciado; y un `AGREGAR` con datos fuera de dominio se ignora sin escribir nada.
 
 ## 3. La estructura escogida y por qué
 
