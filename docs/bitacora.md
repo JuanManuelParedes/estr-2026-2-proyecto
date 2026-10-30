@@ -5,6 +5,11 @@ Va en `docs/`, como los informes.
 Una entrada por sesión de trabajo, con la fecha, quién trabajó, qué se
 hizo y qué quedó pendiente. La entrada más reciente va arriba.
 
+## 2026 - 10 - 30
+- Quiénes: Juan Manuel Paredes, codigo 9034283
+- Qué hicimos: Realicé los casos pruebas, colocandolos en la carpetas `docs/`, con el del enunciado, los propuestos y dos limite, corri make y todo dio ok, por lo que el codigo ya quedó terminado y compila perfecto sin advertencias.
+- Qué quedó pendiente: Terminar de escribir y revisar por completo el informe-avance, con los respectivos casos de prueba y demás.
+
 ## 2026 - 10 - 29
 - Quiénes: Juan Manuel Paredes, codigo 9034283
 - Qué hicimos: Coloque las precondiciones correctas con assert, y termine de corregir todo lo que estuviera mal en todos los archivos, para que todo tenga coherencia, ademas arreglé documentanción y las precondiciones en el informe.
