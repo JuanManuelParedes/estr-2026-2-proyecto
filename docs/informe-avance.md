@@ -1,6 +1,6 @@
 # Informe del avance
 
-*(Borren los comentarios entre paréntesis al escribir.)*
+
 
 ## 1. El escenario
 
@@ -15,7 +15,7 @@ El programa se comunica de manera que el usuario le otorga unas ordenes, en dond
 
 | Operación | Qué hace | Precondición |
 |---|---|---|
-| Agregar (id, nombre, cantidad) | Añade un producto al inventario, con su id, nombre y cantidad. Responde “ok” si se añadió, o “repetido” si el artículo ya estaba. | $\text{id} > 0$; nombre no vacío, sin espacios, de a lo sumo 63 caracteres; $\text{cantidad} > 0$	Son los datos que la estructura sabe guardar: el nombre cabe en char nombre[64] |
+| Agregar (id, nombre, cantidad) | Añade un producto al inventario, con su id, nombre y cantidad. Responde “ok” si se añadió, o “repetido” si el artículo ya estaba. | $\text{id} > 0$; nombre no vacío, sin espacios, de a lo sumo 63 caracteres (cabe en `char nombre[64]`); $\text{cantidad} > 0$ |
 | Eliminar (id) | Quita el artículo con ese id del inventario. Responde “ok” si se eliminó, o “no existe” si no estaba. | Lista no vacia e $\text{id} > 0$, ya que con la lista vacía no hay nada que quitar.  |
 | Consultar (id) | Muestra el artículo con ese id: responde con su id, nombre y cantidad, o con “no existe” si no está. No modifica nada. | Lista no vacia e $\text{id} > 0$, |
 | Reponer (id, cantidad) | Aumenta la cantidad de un artículo que ya está en el inventario. Responde “ok” si se repuso, o “no existe” si el artículo no está. | Lista no vacia, $\text{id} > 0$ y cantidad positiva ($\text{cantidad} > 0$), puesto que con cantidad negativa “reponer” restaría existencias |
@@ -24,9 +24,6 @@ El programa se comunica de manera que el usuario le otorga unas ordenes, en dond
 Si una precondición no se cumple, la estructura no se modifica. Por ejemplo, con el inventario vacío (`ELIMINAR`, `CONSULTAR` o `REPONER`), el programa responde `no existe`, como fija el enunciado; y un `AGREGAR` con datos fuera de dominio se ignora sin escribir nada.
 
 ## 3. La estructura escogida y por qué
-
-**Borrador de Paula para revisión del grupo.** Los costos deberán contrastarse
-con la implementación cuando esté terminada.
 
 Para el avance se utiliza una lista enlazada simple, como pide el escenario A.
 Cada nodo contiene un producto (código, nombre y cantidad) y un puntero al
@@ -45,10 +42,9 @@ La búsqueda lineal revisa desde `cabeza` hasta encontrar el código o alcanzar
 `reponer` reutiliza la misma búsqueda y suma a la cantidad existente. Una
 reposición de un código ausente devuelve fallo y no crea un producto.
 
-Se propone insertar los nuevos productos al principio. Con esa decisión,
-`listar` recorrería los productos presentes en orden inverso al de inserción.
-Eliminar un producto ajustaría los enlaces sin cambiar el orden relativo de
-los demás. Esta decisión debe confirmarse con el grupo antes de implementar.
+Los nuevos productos se insertan al principio. Por eso `listar` recorre los
+productos presentes en orden inverso al de inserción. Eliminar un producto
+ajusta los enlaces sin cambiar el orden relativo de los demás.
 
 Costos esperados en el peor caso, con $n\geq1$ productos, nombres de longitud
 acotada y operaciones sobre enteros de costo constante. El espacio auxiliar
@@ -107,7 +103,7 @@ $$
 
 No se supone una capacidad fija de la lista.
 
-Ejemplo del estado propuesto después de agregar arroz y luego azúcar:
+Ejemplo del estado después de agregar arroz y luego azúcar:
 
 ```mermaid
 flowchart TD
@@ -123,45 +119,115 @@ Referencia para estudiar y contrastar: Cormen, Leiserson, Rivest y Stein,
 *Introduction to Algorithms*, 4.ª edición, MIT Press, 2022, capítulo 10,
 sección 10.2, “Linked lists”; para cotas asintóticas, capítulo 3, sección 3.2.
 La sección 10.2 trata listas enlazadas, incluidas variantes; el análisis
-anterior se aplica específicamente a nuestra propuesta de lista simple.
+anterior se aplica específicamente a nuestra lista simple.
 El [índice oficial](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/11599/4e_toc.pdf)
 permite verificar la numeración; no sustituye la lectura del capítulo.
-**Pendiente:** confirmar que esta es la edición del texto guía que utilizará el grupo.
-
-Sesión del 22 de octubre de 2026, para revisar
-los requisitos y proponer un borrador de explicación y costos. Paula y el grupo deben revisar el contenido y contrastarlo con el texto guía y con su
-implementación.
-
-Sesión del 27 de octubre de 2026, para
-proponer una primera versión de `buscar`, `consultar` y `reponer`
-(`codigo/lista_busqueda.cpp`), del caso funcional 2 y de un banco local de
-pruebas. Paula revisó el código y lo contrastó con las restricciones del
-enunciado.
 
 ## 4. Qué piensan medir
 
-(Qué entrada van a variar, entre qué tamaños, y qué esperan ver.)
+**Qué se varía.** El número de productos $n$ que hay en el inventario. Se
+probarán los tamaños $n$ = 1 000, 2 000, 5 000, 10 000, 20 000 y 50 000.
+
+**Qué se mide.** El tiempo de ejecutar un bloque fijo de 1 000 órdenes
+`CONSULTAR` sobre códigos que **no** están en el inventario. Un código ausente
+obliga a recorrer toda la lista, así que es el peor caso de la búsqueda. Cada
+tamaño se corre varias veces y se reporta el promedio, para reducir el ruido
+del computador.
+
+**Cómo se separa la construcción.** Para llenar el inventario hay que hacer
+$n$ órdenes `AGREGAR`, y cada una busca repetidos en $O(n)$; construir el
+inventario cuesta en total $O(n^2)$. Ese tiempo no debe mezclarse con el de
+las consultas, así que se mide aparte: primero se toma el tiempo de construir
+y después el del bloque de consultas.
+
+**Qué se espera ver.** Según la sección 3, consultar cuesta $O(n)$. Entonces
+el tiempo del bloque de consultas debería crecer de forma lineal: al duplicar
+$n$, el tiempo debería aproximadamente duplicarse. El tiempo de construcción
+debería crecer de forma cuadrática: al duplicar $n$, aproximadamente
+cuadruplicarse.
+
+**Dónde se guardan.** Los resultados van en `datos/`, en un archivo `.csv`
+con una fila por tamaño ($n$, tiempo de construcción y tiempo de consultas).
+
 
 ## 5. Casos de prueba
 
 Las pruebas representan situaciones del inventario de una tienda. Cada caso
 empieza con un inventario vacío y se ejecuta de forma independiente. La
-primera línea de la entrada indica cuántas órdenes se deben procesar.
-Los nombres de productos se escriben sin espacios, como exige el escenario.
-El caso 1 supone la inserción al principio propuesta en la sección 3.
+primera línea de la entrada indica cuántas órdenes se deben procesar. Los
+nombres de productos se escriben sin espacios, como exige el escenario.
 
-| Caso | Situación de la tienda | Archivos de entrada y salida esperada | Salida obtenida con el programa del grupo |
+| Caso | Tipo | Qué prueba | Archivos en `datos/` |
 |---|---|---|---|
-| Funcional 1 | Registrar productos, listar existencias y rechazar un código repetido. | `agregar_listar.in` y `agregar_listar.out`, en `datos/`. | Pendiente de ejecutar cuando esté implementado el programa completo. |
-| Funcional 2 | Consultar existencias y sumar mercancía recibida; verificar códigos ausentes. | `consultar_reponer.in` y `consultar_reponer.out`, en `datos/`. | Pendiente con el programa completo. El banco auxiliar produjo la salida esperada; el detalle aparece debajo del caso. |
-| Funcional 3 | Retirar productos del inventario y comprobar que ya no se pueden consultar. | `eliminar_productos.in` y `eliminar_productos.out`, en `datos/`. | Pendiente de ejecutar cuando esté implementado el programa completo. |
-| Límite | Consultar, reponer, eliminar y listar cuando la tienda todavía no tiene productos registrados. | `inventario_vacio.in` y `inventario_vacio.out`, en `datos/`. | Pendiente de ejecutar cuando esté implementado el programa completo. |
+| 01 | Funcional | El ejemplo oficial del enunciado. | `01_ejemplo_enunciado.in`, `01_ejemplo_enunciado.out` |
+| 02 | Funcional | Agregar, código repetido y orden de `LISTAR`. | `02_agregar_listar.in`, `02_agregar_listar.out` |
+| 03 | Funcional | Consultar, reponer y códigos ausentes. | `03_consultar_reponer.in`, `03_consultar_reponer.out` |
+| 04 | Funcional | Eliminar en el medio, en la cabeza y el último. | `04_eliminar.in`, `04_eliminar.out` |
+| 05 | Límite | Todas las operaciones con el inventario vacío. | `05_limite_vacio.in`, `05_limite_vacio.out` |
+| 06 | Límite | Un solo elemento, repetido, cantidad 0, código grande, vaciar y volver a llenar. | `06_limite_borde.in`, `06_limite_borde.out` |
 
-### Caso funcional 1: registrar y listar productos
+Los seis casos se ejecutaron con `make pruebas` (desde `codigo/`) y la salida
+obtenida coincide con la esperada en todos. El programa compiló con
+`-Wall -Wextra` sin advertencias. La comparación usa
+`diff --strip-trailing-cr`, que ignora el `\r` que Windows agrega al final de
+cada línea; sin esa opción, archivos con el mismo contenido se reportarían
+como distintos.
 
-Se registran arroz y leche. Después se intenta registrar otra vez el código
-del arroz, con una cantidad diferente. El inventario debe rechazar el
-repetido y conservar las 20 unidades originales.
+Resultado de `make pruebas`:
+
+```text
+  OK   01_ejemplo_enunciado.in
+  OK   02_agregar_listar.in
+  OK   03_consultar_reponer.in
+  OK   04_eliminar.in
+  OK   05_limite_vacio.in
+  OK   06_limite_borde.in
+```
+
+### Caso 01 (funcional): ejemplo del enunciado
+
+Es el ejemplo oficial del enunciado. Se registran arroz y azúcar, se consulta el arroz, se reponen 10 unidades de azúcar, se elimina el arroz y se comprueba que ya no existe.
+
+**Entrada:**
+
+```text
+7
+AGREGAR 1004512 arroz 20
+AGREGAR 1004498 azucar 5
+CONSULTAR 1004512
+REPONER 1004498 10
+CONSULTAR 1004498
+ELIMINAR 1004512
+CONSULTAR 1004512
+```
+
+**Salida esperada:**
+
+```text
+ok
+ok
+1004512 arroz 20
+ok
+1004498 azucar 15
+ok
+no existe
+```
+
+**Salida obtenida:**
+
+```text
+ok
+ok
+1004512 arroz 20
+ok
+1004498 azucar 15
+ok
+no existe
+```
+
+### Caso 02 (funcional): agregar y listar
+
+Se registran arroz y leche y se listan. Después se intenta registrar otra vez el código del arroz con otra cantidad: el inventario responde `repetido` y conserva las 20 unidades originales. Como la inserción es al principio, `LISTAR` muestra primero la leche.
 
 **Entrada:**
 
@@ -185,15 +251,20 @@ repetido
 101 arroz 20
 ```
 
-**Salida obtenida:** pendiente de ejecutar con el programa completo. `LISTAR`
-produce dos líneas; por eso la salida tiene más líneas que órdenes.
+**Salida obtenida:**
 
-### Caso funcional 2: consultar y reponer existencias
+```text
+ok
+ok
+102 leche 6
+101 arroz 20
+repetido
+101 arroz 20
+```
 
-Se registran arroz, azúcar y sal. Se consultan sus existencias, se suma la
-mercancía recibida y se consulta de nuevo para verificar el aumento.
-También se usa un código inexistente: la reposición debe informar el fallo
-y no crear un producto nuevo.
+### Caso 03 (funcional): consultar y reponer
+
+Se registran arroz, azúcar y sal, se consultan, se suma mercancía a cada uno y se consulta de nuevo para verificar el aumento. Con el código 999, que no existe, consultar y reponer responden `no existe`, y reponer no crea un producto nuevo.
 
 **Entrada:**
 
@@ -236,11 +307,7 @@ no existe
 no existe
 ```
 
-**Salida obtenida:** corrida con un banco auxiliar local, que une
-`buscar`, `consultar` y `reponer` (`codigo/lista_busqueda.cpp`) con piezas
-provisionales de `agregar`, `listar` y `eliminar`. La salida fue idéntica a
-la esperada (15 líneas, comparadas con `diff`) y la corrida con
-`-fsanitize=address,undefined` no reportó errores:
+**Salida obtenida:**
 
 ```text
 ok
@@ -260,18 +327,9 @@ no existe
 no existe
 ```
 
-Esta corrida no sustituye la del programa completo: cuando estén las piezas
-de `lista.h` y `principal.cpp`, se debe ejecutar `make pruebas` y registrar
-aquí la salida de ese programa.
+### Caso 04 (funcional): eliminar
 
-
-### Caso funcional 3: eliminar productos
-
-Se registran tres productos. Con inserción al principio, se elimina primero
-la leche de la posición intermedia, después el pan del inicio y por último
-el arroz, que queda como único producto. Las consultas deben confirmar cada
-eliminación. Un segundo intento de eliminar el arroz debe responder que no
-existe.
+Se registran tres productos (la lista queda pan, leche, arroz). Se elimina la leche, que está en el medio; luego el pan, que está en la cabeza; y por último el arroz, que queda como único nodo. Cada consulta confirma la eliminación. Un segundo `ELIMINAR 10` responde `no existe` y el `LISTAR` final no imprime nada porque la lista quedó vacía.
 
 **Entrada:**
 
@@ -307,14 +365,25 @@ no existe
 no existe
 ```
 
-**Salida obtenida:** pendiente de ejecutar con el programa completo. El
-`LISTAR` de este caso no produce ninguna línea porque ya no quedan productos.
+**Salida obtenida:**
 
-### Caso límite: inventario vacío
+```text
+ok
+ok
+ok
+ok
+no existe
+ok
+no existe
+ok
+no existe
+no existe
+no existe
+```
 
-Este caso comprueba el comportamiento antes de registrar el primer producto.
-Consultar, reponer o eliminar un código ausente debe responder `no existe`.
-Listar un inventario vacío no imprime productos ni mensajes adicionales.
+### Caso 05 (límite): inventario vacío
+
+Todas las operaciones se ejecutan antes de registrar el primer producto. Consultar, reponer y eliminar responden `no existe`, y los dos `LISTAR` no imprimen ninguna línea.
 
 **Entrada:**
 
@@ -335,10 +404,87 @@ no existe
 no existe
 ```
 
-**Salida obtenida:** pendiente de ejecutar con el programa completo. Las dos
-órdenes `LISTAR` no producen líneas en la salida.
+**Salida obtenida:**
 
-Las entradas y salidas esperadas ya están preparadas como archivos de texto.
-Cuando el grupo implemente todas las operaciones, debe ejecutar `make pruebas`
-y registrar las salidas reales antes de entregar. No se considera ejecutada
-una prueba por haber escrito su salida esperada.
+```text
+no existe
+no existe
+no existe
+```
+
+### Caso 06 (límite): casos de borde
+
+Prueba un inventario de un solo elemento, un código repetido, órdenes con cantidad 0 (que violan la precondición y se ignoran sin escribir nada), un código grande (2 000 000 000), eliminar el último nodo y el único nodo, y vaciar el inventario para volver a llenarlo.
+
+**Entrada:**
+
+```text
+21
+AGREGAR 5 pan 1
+AGREGAR 5 galleta 50
+CONSULTAR 5
+REPONER 5 0
+AGREGAR 6 sal 0
+CONSULTAR 6
+ELIMINAR 5
+LISTAR
+AGREGAR 5 galleta 50
+AGREGAR 2000000000 caja 1
+REPONER 2000000000 4
+CONSULTAR 2000000000
+AGREGAR 7 azucar 3
+ELIMINAR 2000000000
+ELIMINAR 8
+REPONER 8 1
+LISTAR
+ELIMINAR 5
+ELIMINAR 7
+CONSULTAR 7
+LISTAR
+```
+
+**Salida esperada:**
+
+```text
+ok
+repetido
+5 pan 1
+no existe
+ok
+ok
+ok
+ok
+2000000000 caja 5
+ok
+ok
+no existe
+no existe
+7 azucar 3
+5 galleta 50
+ok
+ok
+no existe
+```
+
+**Salida obtenida:**
+
+```text
+ok
+repetido
+5 pan 1
+no existe
+ok
+ok
+ok
+ok
+2000000000 caja 5
+ok
+ok
+no existe
+no existe
+7 azucar 3
+5 galleta 50
+ok
+ok
+no existe
+```
