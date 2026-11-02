@@ -1,5 +1,5 @@
-/* Autores: Paula Bonilla Leon	9038204, Jerónimo Hurtado Mora	9038219, Juan Manuel Paredes Betancourt	9034283
-Punto de entrada del proyecto. Lee ordenes de la entrada estandar, una por
+// Autores: Paula Bonilla Leon	9038204, Jerónimo Hurtado Mora	9038219, Juan Manuel Paredes Betancourt	9034283
+/*Punto de entrada del proyecto. Lee ordenes de la entrada estandar, una por
 linea, ejecuta la operacion correspondiente sobre la lista del inventario y
 escribe una respuesta por orden. Lee primero cuántas ordenes vienen y procesa exactamente esas
 Formato de ordenes:

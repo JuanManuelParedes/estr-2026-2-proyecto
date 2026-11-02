@@ -1,5 +1,5 @@
-/* Autores: Paula Bonilla Leon	9038204, Jerónimo Hurtado Mora	9038219, Juan Manuel Paredes Betancourt	9034283
-Lista enlazada simple del inventario: agregar, listar, buscar (interna), consultar, reponer y eliminar. 
+// Autores: Paula Bonilla Leon	9038204, Jerónimo Hurtado Mora	9038219, Juan Manuel Paredes Betancourt	9034283
+/*Lista enlazada simple del inventario: agregar, listar, buscar (interna), consultar, reponer y eliminar. 
 Las que buscan comparten el mismo recorrido lineal desde cabeza.
 Los nodos y la clase Lista estan en lista.h.*/
 #include "lista.h"
@@ -75,8 +75,7 @@ void Lista::listar() const{
 /* Si el codigo esta, copia el producto en salida y devuelve true; si no,
 devuelve false y deja salida como estaba. No modifica la lista.
 Costo: el de buscar, O(n); la copia del producto es de tamano acotado
-Precondicion: n >= 1 y codigo > 0. Con la lista vacia no hay nada que
-buscar y devuelve false (el main escribe "no existe"). */
+Precondicion: n >= 1 y codigo > 0. */
 bool Lista::consultar(long codigo, Producto& salida) const {
   assert(!vacia());
   assert(codigo > 0);
@@ -92,8 +91,7 @@ bool Lista::consultar(long codigo, Producto& salida) const {
 Si el codigo esta, suma cantidad a las existencias y devuelve true; si no,
 devuelve false y NO crea ningun producto.
 Costo: el de buscar, O(n); la suma es O(1).
-Precondicion: n >= 1, codigo > 0, cantidad > 0. 
-Si cantidad <= 0 no modifica nada y devuelve false.*/
+Precondicion: n >= 1, codigo > 0, cantidad > 0. */
 bool Lista::reponer(long codigo, int cantidad){
   assert(!vacia());
   assert(codigo > 0);
@@ -110,8 +108,7 @@ bool Lista::reponer(long codigo, int cantidad){
 elimino; false si el codigo no estaba (no modifica la lista).
 Costo: O(n) para ubicar el nodo y su anterior; desenlazar y liberar es O(1).
 Espacio auxiliar: O(1).
-Precondicion: n >= 1 y codigo > 0. Con la lista vacia no hay nada que
-buscar y devuelve false (el main escribe "no existe").*/
+Precondicion: n >= 1 y codigo > 0.*/
 bool Lista::eliminar(long codigo){
   assert(!vacia());
   assert(codigo > 0);

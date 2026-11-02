@@ -2,11 +2,12 @@
 CC      = g++
 CFLAGS  = -Wall -Wextra -O2
 FUENTES = principal.cpp lista.cpp
+ENCABEZADOS = lista.h
 PROGRAMA = proyecto
 
 all: $(PROGRAMA)
 
-$(PROGRAMA): $(FUENTES)
+$(PROGRAMA): $(FUENTES) $(ENCABEZADOS)
 	$(CC) $(CFLAGS) $(FUENTES) -o $(PROGRAMA)
 
 # Corre cada entrada de ../datos/ y compara con su salida esperada
