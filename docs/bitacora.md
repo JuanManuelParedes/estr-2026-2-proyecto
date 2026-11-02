@@ -5,12 +5,12 @@ Va en `docs/`, como los informes.
 Una entrada por sesión de trabajo, con la fecha, quién trabajó, qué se
 hizo y qué quedó pendiente. La entrada más reciente va arriba.
 
-## 2026 - 10 - 31
+## 2026 - 11 - 01
 - Quiénes: Jerónimo Hurtado Mora, código 9038219
 - Qué hicimos: Terminé de actualizar el informe del avance. Reescribí la sección 5 con los seis casos de prueba y sus salidas obtenidas con `make pruebas`, escribí la sección 4 (qué medir: variar el número de productos, medir el tiempo de las consultas y separar el tiempo de construcción) y quité los textos de borrador y pendientes de las secciones 2 y 3.
 - Qué quedó pendiente: Hacer las mediciones de la sección 4.
 
-## 2026 - 10 - 30
+## 2026 - 10 - 28
 - Quiénes: Jerónimo Hurtado Mora, código 9038219
 - Qué hicimos: Escribí `eliminar` en `lista.cpp` (casos primero, intermedio, último y lista vacía) y `principal.cpp`, que lee las órdenes, llama a la lista y escribe las respuestas. Corrí `make pruebas` con el programa completo: los seis casos dieron OK y compiló sin advertencias. Reescribí la sección 5 del informe con las salidas obtenidas, escribí la sección 4 (qué medir) y limpié los textos de borrador de las secciones 2 y 3.
 - Qué quedó pendiente: Hacer las mediciones de la sección 4 
