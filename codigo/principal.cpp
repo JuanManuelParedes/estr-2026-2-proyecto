@@ -46,17 +46,26 @@ int main(){
   // termina.
   while (leidas < total && scanf("%15s", orden) == 1){
     leidas++;
-    if (iguales(orden, "AGREGAR")){
+      if (iguales(orden, "AGREGAR")){
       long codigo;
       char nombre[64];
       int cantidad;
-      if (scanf("%ld %63s %d", &codigo, nombre, &cantidad) == 3 && codigo > 0 && cantidad > 0){
-        int estado = inventario.agregar(codigo, nombre, cantidad);
-        if (estado == 0){
-          printf("ok\n");
-        }
-        else if (estado == 1){
-          printf("repetido\n");
+      if (scanf("%ld %63s", &codigo, nombre) == 2){
+        // Si el nombre tenia mas de 63 caracteres, descarta el resto de la palabra.
+        int descartados = scanf("%*[^ \t\r\n]");
+        (void) descartados;
+        if (scanf("%d", &cantidad) == 1){
+          if (codigo > 0 && cantidad > 0){
+            int estado = inventario.agregar(codigo, nombre, cantidad);
+            if (estado == 0){
+              printf("ok\n");
+            }
+            else if (estado == 1){
+              printf("repetido\n");
+            }
+          }else{
+            printf("invalido\n");
+          }
         }
       }
     }
@@ -75,13 +84,17 @@ int main(){
       }
     }
     else if (iguales(orden, "REPONER")){
-      long codigo;
-      int cantidad;
-      if (scanf("%ld %d", &codigo, &cantidad) == 2 && codigo > 0 && cantidad > 0){
-        if (!inventario.vacia() && inventario.reponer(codigo, cantidad)){
-          printf("ok\n");
+    long codigo;
+    int cantidad;
+      if (scanf("%ld %d", &codigo, &cantidad) == 2){
+        if (codigo > 0 && cantidad > 0){
+          if (!inventario.vacia() && inventario.reponer(codigo, cantidad)){
+            printf("ok\n");
+          }else{
+            printf("no existe\n");
+          }
         }else{
-          printf("no existe\n");
+          printf("invalido\n");
         }
       }
     }

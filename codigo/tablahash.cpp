@@ -3,7 +3,6 @@ Tabla hash del inventario con encadenamiento: cada cubeta es una Lista.
 Operaciones: indice (funcion hash), constructor, destructor, agregar, listar,
 consultar, reponer y eliminar. Las declaraciones estan en tablahash.h. */
 #include "tablahash.h"
-#include <new>        // std::nothrow
 
 /* Devuelve el indice de la cubeta (0..numeroCubetas-1) que le corresponde al codigo, con
 el metodo de la division: el residuo de codigo entre numeroCubetas.
@@ -19,20 +18,15 @@ int TablaHash::indice(long codigo) const{
 }
 
 /* Reserva el arreglo de numeroCubetas listas vacias y deja la tabla sin
-articulos. Si malloc/new no logra reservar, la tabla queda con 0 cubetas y 0
-articulos (vacia() da true) y agregar devolvera 2.
+articulos. 
 Costo: O(m), con m = numeroCubetas, porque se construye una Lista por cubeta.
 Espacio: O(m) para el arreglo de cubetas.
 Precondicion: numeroCubetas > 0. */
 TablaHash::TablaHash(int numeroCubetas){
     assert(numeroCubetas > 0);
+    this->numeroCubetas = numeroCubetas;
     this->numeroArticulos = 0;
-    this->cubetas = new (std::nothrow) Lista[numeroCubetas];
-    if(this->cubetas != nullptr){
-        this->numeroCubetas = numeroCubetas;
-    }else{
-        this->numeroCubetas = 0;
-    }
+    this->cubetas = new Lista[numeroCubetas];
 }
 
 /* Libera el arreglo de cubetas, donde por dentro, el destructor de cada Lista libera sus nodos.
@@ -45,8 +39,7 @@ TablaHash::~TablaHash() {
 /* Agrega un articulo nuevo a la tabla. Calcula la cubeta del codigo con
 indice y delega al agregar de lista de esa cubeta, que detecta el codigo
 repetido y enlaza el nodo en cabeza. Devuelve 0 si lo agrego, 1 si el codigo
-ya estaba (sin modificar la tabla) y 2 si no se pudo reservar memoria: o bien
-el constructor no logro reservar las cubetas, o malloc fallo al reservar el
+ya estaba (sin modificar la tabla) y 2 si no se pudo reservar memoria o malloc fallo al reservar el
 nodo (tampoco modifica la tabla). numeroArticulos solo aumenta cuando el
 resultado es 0.
 Costo: calcular indice es O(1); el resto es el costo de Lista::agregar sobre
@@ -64,12 +57,9 @@ int TablaHash::agregar(long codigo, const char* nombre, int cantidad) {
     assert(codigo > 0);
     assert(cantidad > 0);
     assert(nombre != nullptr && nombre[0] != '\0');
-    int estado = 2;                      // sin cubetas: no hay donde guardar
-    if (cubetas != nullptr) {
-        estado = cubetas[indice(codigo)].agregar(codigo, nombre, cantidad);
-        if (estado == 0) {
-        numeroArticulos += 1;
-        }
+    int estado = cubetas[indice(codigo)].agregar(codigo, nombre, cantidad);
+    if (estado == 0) {
+        numeroArticulos++;
     }
     return estado;
 }
@@ -85,8 +75,7 @@ Costo: Theta(numeroCubetas + n). El ciclo hace numeroCubetas iteraciones
 aunque haya cubetas vacias, y entre todas las cubetas se escriben los n
 articulos. Con la tabla vacia sigue costando Theta(numeroCubetas).
 Espacio auxiliar: O(1) (el contador del ciclo).
-Precondicion: ninguna. Si el constructor no pudo reservar las cubetas,
-numeroCubetas es 0 y la funcion no escribe nada. */
+Precondicion: ninguna.*/
 void TablaHash::listar() const {
   int i = 0;
   while (i < numeroCubetas) {
