@@ -5,6 +5,11 @@ Va en `docs/`, como los informes.
 Una entrada por sesión de trabajo, con la fecha, quién trabajó, qué se
 hizo y qué quedó pendiente. La entrada más reciente va arriba.
 
+## 2026 - 11 - 12
+- Quiénes: Juan Manuel Paredes, codigo 9034283
+- Qué hicimos: Actualice tablahash.cpp y principal.cpp con los comentarios hechos por el profe e hice las partes 1 y 2 del informe final-
+- Qué quedó pendiente: Las funciones faltantes de `tablahash.cpp`y las partes 3, 4, 5 y 6 del informe final.
+
 ## 2026 - 11 - 10
 - Quiénes: Juan Manuel Paredes, codigo 9034283
 - Qué hicimos: Comencé con la primera parte del código de la sección final, es decir, la tabla hash, realice el `tablahash.h` y agregar y listar, con el constructor, el destructor y una funcion auxiliar en `tablahash.cpp`, con sus respectivos comentarios.
