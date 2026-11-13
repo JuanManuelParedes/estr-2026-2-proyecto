@@ -98,7 +98,7 @@ bool TablaHash::reponer(long codigo, int cantidad) {
   return encontrado;
 }
 
-/* TODO (Jeronimo): eliminar. Actualiza numeroArticulos si elimino. */
+
 /* Elimina de la tabla el articulo con ese codigo y libera su nodo. Calcula la
 cubeta del codigo con indice y delega al eliminar de lista de esa cubeta, que
 ubica el nodo y su anterior, los reenlaza y libera el nodo. Devuelve true si lo
