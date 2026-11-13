@@ -99,8 +99,35 @@ bool TablaHash::reponer(long codigo, int cantidad) {
 }
 
 /* TODO (Jeronimo): eliminar. Actualiza numeroArticulos si elimino. */
+/* Elimina de la tabla el articulo con ese codigo y libera su nodo. Calcula la
+cubeta del codigo con indice y delega al eliminar de lista de esa cubeta, que
+ubica el nodo y su anterior, los reenlaza y libera el nodo. Devuelve true si lo
+elimino y false si el codigo no estaba (sin modificar la tabla).
+numeroArticulos solo disminuye cuando el resultado es true.
+Antes de delegar se revisa que la cubeta no este vacia, porque Lista::eliminar
+exige una lista no vacia y en la tabla es normal que la cubeta del codigo este
+vacia aunque la tabla tenga articulos; en ese caso el codigo no esta y se
+devuelve false sin llamar a la lista.
+Costo: calcular indice es O(1); el resto es el costo de Lista::eliminar sobre
+UNA cubeta, que es O(k) con k el numero de articulos de esa cubeta (ubicar el
+nodo y su anterior), reenlazar y liberar el nodo es O(1). De igual manera el
+costo depende del caso:
+  - Caso esperado: O(1 + alfa), con alfa = n / numeroCubetas, si la funcion
+    hash reparte los codigos de forma uniforme.
+  - Peor caso: O(n), cuando todos los codigos caen en la misma cubeta, es decir, la
+    tabla se comporta como la lista del avance.
+Espacio auxiliar: O(1) (dos punteros dentro de Lista::eliminar).
+Precondicion: tabla no vacia (n >= 1) y codigo > 0. */
 bool TablaHash::eliminar(long codigo) {
-  bool eliminado = false;
-  (void) codigo;
-  return eliminado;
+    assert(!vacia());
+    assert(codigo > 0);
+    bool eliminado = false;
+    Lista& cubeta = cubetas[indice(codigo)];
+    if (!cubeta.vacia()) {
+        eliminado = cubeta.eliminar(codigo);
+    }
+    if (eliminado) {
+        numeroArticulos--;
+    }
+    return eliminado;
 }

@@ -11,9 +11,24 @@ Formato de ordenes:
 Si a una orden le faltan datos o estos no cumplen las precondiciones
 (codigo y cantidad positivos), la ignora sin escribir nada y no toca la lista.
 Con el inventario vacio, CONSULTAR, REPONER y ELIMINAR responden "no existe"
-sin llamar a la lista, que exige que no este vacia.*/
+sin llamar a la lista, que exige que no este vacia.
+El mismo programa sirve para las tres estructuras: el ciclo de ordenes esta en
+procesar, que es una plantilla y solo usa las operaciones de la interfaz comun
+(vacia, agregar, listar, consultar, reponer, eliminar). main construye la
+estructura y se la pasa por referencia, asi el constructor queda fuera de la
+interfaz comun. Cual se construye lo decide el Makefile al compilar:
+-DUSAR_TABLA produce proyecto_tabla, -DUSAR_MAPA produce proyecto_mapa y sin
+bandera sale proyecto_lista.*/
 
 #include "lista.h"
+#include "tablahash.h"
+#if __has_include("mapa.h")
+#include "mapa.h"
+#endif
+
+// Numero de cubetas de la tabla en este programa: un primo, para que el
+// residuo reparta mejor los codigos.
+const int CUBETAS = 1009;
 
 /*Compara dos cadenas caracter por caracter. Devuelve true si son iguales
 (mismos caracteres y misma longitud). Avanza mientras ambas tengan el mismo
@@ -29,8 +44,14 @@ bool iguales(const char *a, const char *b){
   return a[i] == b[i];
 }
 
-int main(){
-  Lista inventario;
+/*Lee las ordenes de la entrada estandar y las ejecuta sobre inventario, que
+puede ser una Lista, una TablaHash o un Mapa: solo se llaman las operaciones
+que las tres tienen con las mismas firmas.
+Costo: la suma de los costos de las ordenes leidas, cada una con el costo de
+la operacion en la estructura usada. Espacio auxiliar: O(1) (buffers de
+tamano fijo para la orden y el nombre).*/
+template <typename Inventario>
+void procesar(Inventario& inventario){
   char orden[16];
   int total = 0;
   int leidas = 0;
@@ -109,6 +130,17 @@ int main(){
       }
     }
   }
+}
+
+int main(){
+#if defined(USAR_TABLA)
+  TablaHash inventario(CUBETAS);
+#elif defined(USAR_MAPA)
+  Mapa inventario;
+#else
+  Lista inventario;
+#endif
+  procesar(inventario);
   // Al salir de main se llama el destructor de inventario, que libera
   // todos los nodos que queden.
   return 0;
