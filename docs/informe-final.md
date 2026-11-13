@@ -295,25 +295,65 @@ Resumen de costos:
 
 ## 4. Experimentos
 
-Máquina, compilador y banderas con que se midió; cómo se generaron las
-entradas; cuántas repeticiones por tamaño.
+### 4.1 Pruebas de corrección
 
-| $n$ | desde cero (ms) | biblioteca (ms) |
+Antes de medir, verificamos que las dos estructuras respondan lo mismo con la
+misma entrada. `make pruebas` corre cada caso de `datos/` con el programa de la
+lista y con el de la tabla (1009 cubetas). Como `LISTAR` sale en orden
+distinto en cada estructura, los casos con `LISTAR` tienen además un archivo
+`nombre.tabla.out` con la salida esperada de la tabla.
+
+Además de los casos del avance, agregamos tres casos pensados para la tabla:
+
+| Caso | Tipo | Qué verifica |
 |---|---|---|
-| 1000 |  |  |
-| 5000 |  |  |
-| 10000 |  |  |
-| 50000 |  |  |
-| 100000 |  |  |
+| 07 | funcional | Eliminar con colisiones: 5, 1014 y 2023 caen en la cubeta 5; elimina en medio de la cadena, repite una eliminación y elimina un código cuya cubeta está vacía aunque la tabla no lo esté. |
+| 08 | límite | Bordes del índice: 1009 (cubeta 0), 1008 (cubeta $m-1$) y 2018 (cubeta 0 otra vez); vacía la tabla, consulta y elimina sobre ella vacía y vuelve a agregar. |
+| 09 | límite | Eliminar con códigos no positivos (`0` y `-5`) con el inventario lleno: responde `no existe` sin modificar nada. En la tabla esto evita un índice negativo, porque el residuo de un número negativo es negativo. Luego elimina los dos productos y repite una eliminación. |
 
-```mermaid
-xychart-beta
-  title "Tiempo contra tamaño de la entrada"
-  x-axis [1000, 5000, 10000, 50000, 100000]
-  y-axis "milisegundos" 0 --> 100
-  line [1, 5, 12, 60, 130]
-  line [1, 4, 9, 45, 95]
-```
+Pendiente: pegar la salida de `make pruebas` cuando estén `consultar` y
+`reponer` de la tabla.
+
+### 4.2 Cómo se midió
+
+**Máquina.** Pendiente: procesador, memoria RAM, sistema operativo y la
+salida de `g++ --version`. Todas las mediciones se hicieron en esa misma
+máquina, compilando con `g++ -Wall -Wextra -O2`.
+
+**Qué se mide.** El programa `codigo/medir.cpp` toma $n$ códigos distintos y,
+sobre una estructura vacía, mide por separado tres fases: agregar los $n$
+artículos, consultarlos todos y eliminarlos todos. Las consultas y las
+eliminaciones van en un orden aleatorio distinto al de inserción. Igual que
+`principal.cpp`, la medición es una plantilla que solo usa la interfaz común,
+y `main` construye la estructura. La columna `encontrados` cuenta las
+consultas que respondieron que el artículo estaba y debe ser $n$: así
+verificamos que cada estructura funciona mientras se mide.
+
+**Entradas.** Los códigos se generan con semilla fija (2026), así que las tres
+estructuras reciben exactamente la misma entrada:
+
+- *Aleatorio:* $n$ códigos distintos al azar entre $1$ y $10^9$.
+- *Una cubeta:* los códigos $m, 2m, \dots, nm$, que tienen residuo 0 y caen
+  todos en la cubeta 0. Es el peor caso de la tabla.
+
+**Configuraciones.** Para cada $n \in \{1000, 2000, 5000, 10000, 20000, 40000\}$
+medimos: la lista; la tabla con $m = 101$ (tabla pequeña, $\alpha$ crece con
+$n$), con $m$ el primo $\ge n$ ($\alpha \approx 1$) y con $m$ el primo
+$\ge 2n$ ($\alpha \approx 1/2$); la tabla con todos los códigos en una cubeta;
+y `map` como referencia.
+
+**Repeticiones.** Cada configuración se mide 5 veces y se reporta la mediana,
+que es menos sensible que el promedio a una repetición interrumpida por el
+sistema operativo. Cada repetición corre en un proceso nuevo: si se repite
+dentro del mismo programa, los nodos liberados al eliminar en desorden quedan
+revueltos en la memoria dinámica, y desde la segunda repetición la lista
+recibe nodos dispersos y se ve más lenta por cómo quedó la memoria, no por la
+estructura.
+
+### 4.3 Resultados
+
+Pendiente: tablas de `agregar`, `consultar` y `eliminar` (en milisegundos)
+y las gráficas `xychart-beta`.
 
 ## 5. Lo medido contra lo predicho
 
