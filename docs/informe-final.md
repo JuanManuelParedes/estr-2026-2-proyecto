@@ -55,20 +55,6 @@ Lo único que si varía entre las estructuras es su construcción, ya que la tab
 
 ## 3. Análisis formal de complejidad
 
-Una demostración por operación no trivial, en cuatro partes:
-
-**Teorema.** (Enunciado con la cota.)
-
-**Demostración.** Se procede de forma directa. (La estrategia.)
-
-*Desarrollo.* (La cadena de desigualdades, con la justificación de cada
-paso.)
-
-$$T(n) = \ldots \leq c \cdot n^2 \quad \text{para todo } n \geq k$$
-
-*Conclusión.* Por lo tanto, $T(n) \in O(n^2)$ con testigos $c = \ldots$
-y $k = \ldots$
-
 ### Modelo de costo
 
 Contamos operaciones elementales: cada comparación, asignación, operación
@@ -82,6 +68,92 @@ $b$.
 Usamos la notación del avance: $v_i$ es el nodo en la posición $i$ y $c_i$ su
 código, con $v_0 = \mathrm{cabeza}$. Por convención, $v_n = \mathrm{nullptr}$
 y $v_{-1} = \mathrm{nullptr}$.
+
+### Consultar y reponer en la lista
+
+**Teorema.** `consultar` y `reponer` tienen tiempo de peor caso $O(n)$ y espacio auxiliar $O(1)$.
+
+**Estrategia.** Las dos operaciones llaman a `buscar`. Cuando se encuentra el producto, `consultar` copia sus datos a `salida` y `reponer` suma unidades a la cantidad existente. Como el registro tiene tamaño fijo, ambas acciones cuestan tiempo constante.
+
+**Desarrollo.** Sea $x$ el código solicitado. Después de $j$ avances, el invariante de `buscar` es:
+
+$$
+0\le j\le n,\qquad
+\mathrm{actual}=v_j,\qquad
+\forall i\in\{0,\ldots,j-1\},\ c_i\ne x.
+$$
+
+Al inicio, $j=0$ y `actual` apunta a `cabeza`. Cada avance ocurre porque el nodo actual existe y su código no coincide. Por eso el invariante se conserva al pasar al nodo siguiente. Si el código no aparece, se llega a $v_n$, que es `nullptr`.
+
+Cada avance cuesta como máximo tres unidades: dos comparaciones y una asignación. Fuera del ciclo, `buscar` usa hasta cuatro unidades: la asignación inicial, la evaluación final de la condición y el retorno. La operación que llama a `buscar` usa hasta diez unidades adicionales para las validaciones, las asignaciones, la decisión, la copia o la suma, y el retorno. Por tanto:
+
+$$
+T_L(n)\le 3j+14\le 3n+14\le 17n
+\qquad \text{para } n\ge 1.
+$$
+
+**Conclusión.** Los testigos son $c=17$ y $k=1$. Si el código no existe, se recorren los $n$ nodos, de modo que el peor caso es $\Theta(n)$. Si está en el primer nodo, el tiempo es $O(1)$. El espacio auxiliar es $O(1)$ porque la cantidad de variables no crece con $n$.
+
+### Consultar y reponer en la tabla hash
+
+**Teorema.** Ambas operaciones cuestan $O(1+k_b)$, donde $k_b$ es la cantidad de productos en la cubeta del código. Su peor caso es $O(n)$ y su espacio auxiliar es $O(1)$.
+
+**Estrategia.** La tabla calcula la cubeta con $b=x\bmod m$. Si está vacía, devuelve `false`. Si contiene productos, delega en `consultar` o `reponer` de esa lista.
+
+**Desarrollo.** El cálculo del índice, el acceso a la cubeta, la comprobación de si está vacía y el manejo del resultado requieren una cantidad fija de operaciones, acotada por 14 unidades en este modelo. Si la cubeta no está vacía, se aplica la cota de la lista con $k_b$ en vez de $n$. Si está vacía, se omite esa llamada. Como $k_b\le n$:
+
+$$
+T_H(n,m)\le 14+(3k_b+14)\le 3n+28\le 31n
+\qquad \text{para } n\ge 1.
+$$
+
+**Conclusión.** Para el peor caso, los testigos son $c=31$ y $k=1$. Si todos los códigos caen en una sola cubeta, la búsqueda puede recorrer los $n$ productos. Bajo la hipótesis de distribución uniforme, el tamaño esperado de la cubeta consultada es a lo sumo $1+\alpha$, por lo que el tiempo esperado es $O(1+\alpha)$, con $\alpha=n/m$. Consultar no cambia el inventario y reponer solo cambia la cantidad del producto encontrado.
+
+### Agregar en la lista y en la tabla hash
+
+**Teorema.** `Lista::agregar` cuesta $O(n)$ en el peor caso. `TablaHash::agregar` cuesta $O(1+k_b)$ y su peor caso es $O(n)$. El espacio auxiliar es $O(1)$ en ambas.
+
+**Estrategia.** La lista busca el código para impedir duplicados. Si el código no existe y se puede reservar memoria, copia el nombre y enlaza el nodo al principio. La tabla calcula la cubeta y delega la inserción en su lista.
+
+**Desarrollo.** La búsqueda en la lista cuesta a lo sumo $3n+4$. El resto se acota con una constante $A$: se reserva un nodo de tamaño fijo, se copian hasta 63 caracteres y se actualizan los enlaces y el contador. Sea $H$ la cota constante del trabajo propio de la tabla: calcular el índice, seleccionar la cubeta y actualizar el contador si la inserción tiene éxito.
+
+$$
+T_{L,\mathrm{agregar}}(n)\le 3n+4+A
+\le (7+A)n
+\qquad \text{para } n\ge 1.
+$$
+
+$$
+T_{H,\mathrm{agregar}}(n,m)\le H+3k_b+4+A
+\le (7+A+H)n
+\qquad \text{para } n\ge 1.
+$$
+
+**Conclusión.** Los testigos son $c=7+A$, $k=1$ para la lista y $c=7+A+H$, $k=1$ para la tabla. En la tabla, con distribución uniforme, el tiempo esperado es $O(1+\alpha)$. Una inserción exitosa añade un nodo al inventario; si el código está repetido, no se añade ninguno.
+
+### Listar en la lista y en la tabla hash
+
+**Teorema.** `Lista::listar` cuesta $\Theta(n)$ para $n\ge 1$, y `TablaHash::listar` cuesta $\Theta(m+n)$. Ambas usan espacio auxiliar $O(1)$.
+
+**Estrategia.** La lista visita cada nodo e imprime su producto. La tabla recorre todas las cubetas, incluso las vacías, y llama a `listar` sobre cada una. Emitir una línea tiene costo acotado porque los nombres tienen longitud máxima y los campos numéricos son de tamaño fijo.
+
+**Desarrollo.** En la lista, después de $j$ iteraciones se han impreso los primeros $j$ productos y `actual` apunta a $v_j$. Si $A_L$ acota el trabajo fijo y $B_L$ el trabajo por nodo, entonces:
+
+$$
+T_{L,\mathrm{listar}}(n)\le A_L+B_Ln
+\le (A_L+B_L)n
+\qquad \text{para } n\ge 1.
+$$
+
+En la tabla, tras procesar las primeras $i$ cubetas se han impreso $\sum_{b=0}^{i-1}k_b$ productos. Al terminar, se han visitado las $m$ cubetas y se han impreso $\sum_{b=0}^{m-1}k_b=n$ productos. Si $A_H$ acota el trabajo fijo y $B_H$ el trabajo por cubeta, incluido el costo fijo de llamar a su lista, entonces:
+
+$$
+T_{H,\mathrm{listar}}(n,m)\le A_H+B_Hm+B_Ln
+\le (A_H+B_H+B_L)(m+n)
+\qquad \text{para } m+n\ge 1.
+$$
+
+**Conclusión.** Los testigos son $c=A_L+B_L$, $k=1$ para la lista y $c=A_H+B_H+B_L$, $k=1$ para la tabla, tomando $m+n$ como tamaño. Las cotas son ajustadas porque la lista visita todos sus nodos y la tabla, además, visita todas las cubetas. Una lista vacía termina en tiempo constante. Ninguna de las dos operaciones cambia el inventario.
 
 ### Eliminar en la lista
 
@@ -288,6 +360,12 @@ Resumen de costos:
 
 | Operación | Desde cero | De la biblioteca | Por qué |
 |---|---|---|---|
+| Consultar y reponer, lista | $O(n)$ peor caso | $O(\log n)$ | Se busca el código y luego se copia o actualiza el producto. |
+| Consultar y reponer, tabla | $O(1+\alpha)$ esperado; $O(n)$ peor caso | $O(\log n)$ | Solo se busca en la cubeta del código. |
+| Agregar, lista | $O(n)$ peor caso | $O(\log n)$ | Se detectan códigos repetidos antes de insertar. |
+| Agregar, tabla | $O(1+\alpha)$ esperado; $O(n)$ peor caso | $O(\log n)$ | Se comprueban los duplicados en una sola cubeta. |
+| Listar, lista | $\Theta(n)$ | $\Theta(n)$ | Se imprime cada producto. |
+| Listar, tabla | $\Theta(m+n)$ | $\Theta(n)$ | Se recorren todas las cubetas y se imprime cada producto. |
 | Eliminar, lista | $O(n)$ peor caso | $O(\log n)$ | La lista recorre hasta el nodo y su anterior; `map` baja por un árbol balanceado de altura $O(\log n)$. |
 | Eliminar, tabla | $O(1 + \alpha)$ esperado, $O(n)$ peor caso | $O(\log n)$ | La tabla solo recorre la cubeta del código; si todos caen en la misma cubeta, recorre todos. |
 | Espacio, lista | $\Theta(n)$ | $\Theta(n)$ | Un nodo por artículo. |
