@@ -84,18 +84,28 @@ void TablaHash::listar() const {
   }
 }
 
-/* TODO (Paula): consultar. Recuerda proteger la cubeta vacia. */
+/* Consulta el producto en su cubeta. Si está vacía, devuelve false. */
 bool TablaHash::consultar(long codigo, Producto& salida) const {
-  bool encontrado = false;
-  (void) codigo; (void) salida;
-  return encontrado;
+    const Lista& cubeta = cubetas[indice(codigo)];
+    bool encontrado = false;
+
+    if (!cubeta.vacia()) {
+        encontrado = cubeta.consultar(codigo, salida);
+    }
+
+    return encontrado;
 }
 
-/* TODO (Paula): reponer. */
+/* Suma unidades al producto sin cambiar el número de artículos. */
 bool TablaHash::reponer(long codigo, int cantidad) {
-  bool encontrado = false;
-  (void) codigo; (void) cantidad;
-  return encontrado;
+    Lista& cubeta = cubetas[indice(codigo)];
+    bool encontrado = false;
+
+    if (!cubeta.vacia()) {
+        encontrado = cubeta.reponer(codigo, cantidad);
+    }
+
+    return encontrado;
 }
 
 
