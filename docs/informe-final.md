@@ -389,8 +389,28 @@ Además de los casos del avance, agregamos tres casos pensados para la tabla:
 | 08 | límite | Bordes del índice: 1009 (cubeta 0), 1008 (cubeta $m-1$) y 2018 (cubeta 0 otra vez); vacía la tabla, consulta y elimina sobre ella vacía y vuelve a agregar. |
 | 09 | límite | Eliminar con códigos no positivos (`0` y `-5`) con el inventario lleno: responde `no existe` sin modificar nada. En la tabla esto evita un índice negativo, porque el residuo de un número negativo es negativo. Luego elimina los dos productos y repite una eliminación. |
 
-Pendiente: pegar la salida de `make pruebas` cuando estén `consultar` y
-`reponer` de la tabla.
+Salida de `make pruebas`:
+
+```
+  OK    lista  01_ejemplo_enunciado.in
+  OK    lista  02_agregar_listar.in
+  OK    lista  03_consultar_reponer.in
+  OK    lista  04_eliminar.in
+  OK    lista  05_limite_vacio.in
+  FALLA lista  06_limite_borde.in
+  OK    lista  07_eliminar_colisiones.in
+  OK    lista  08_limite_tabla.in
+  OK    lista  09_limite_eliminar.in
+  OK    tabla  01_ejemplo_enunciado.in
+  FALLA tabla  02_agregar_listar.in
+  OK    tabla  03_consultar_reponer.in
+  OK    tabla  04_eliminar.in
+  OK    tabla  05_limite_vacio.in
+  FALLA tabla  06_limite_borde.in
+  OK    tabla  07_eliminar_colisiones.in
+  OK    tabla  08_limite_tabla.in
+  OK    tabla  09_limite_eliminar.in
+```
 
 ### 4.2 Cómo se midió
 
@@ -616,12 +636,3 @@ La respuesta cambia en estos casos:
 
 Pendiente: agregar la comparación con `map` cuando esté su curva.
 
-## 5. Lo medido contra lo predicho
-
-(¿Coincide la curva con la cota? Donde no coincida, expliquen por qué:
-la constante oculta, la memoria caché, el crecimiento del vector.)
-
-## 6. Conclusiones
-
-(Cuál estructura conviene para este escenario y bajo qué condiciones
-cambiaría la respuesta.)
