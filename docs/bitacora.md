@@ -5,6 +5,11 @@ Va en `docs/`, como los informes.
 Una entrada por sesión de trabajo, con la fecha, quién trabajó, qué se
 hizo y qué quedó pendiente. La entrada más reciente va arriba.
 
+## 2026 - 11 - 13
+- Quiénes: Jerónimo Hurtado Mora, código 9038219
+- Qué hicimos: Actualicé el Makefile para producir `proyecto_lista`, `proyecto_tabla` y `medidor`, con los objetivos `medir` y `tablas`. Corrí los experimentos (6 tamaños, 5 repeticiones, lista y tabla con m = 101, m ≈ n, m ≈ 2n y una sola cubeta) y subí `mediciones.csv` y `mediciones-crudas.csv`. Escribí en el informe final los resultados (4.3), el contraste con el análisis (5) y las conclusiones (6).
+- Qué quedó pendiente: Medir `map` cuando esté `mapa.h` y actualizar resultados y conclusiones; datos de la máquina en 4.2.
+
 ## 2026 - 11 - 13 — Informe final
 
 - Quiénes: Paula Bonilla Leon, código 9038204.
@@ -17,7 +22,7 @@ hizo y qué quedó pendiente. La entrada más reciente va arriba.
 - Qué hicimos: Implementé `consultar` y `reponer` en `codigo/tablahash.cpp`. Ambas funciones verifican que la cubeta tenga productos antes de buscar en ella. Compilé la versión de tabla hash y ejecuté `03_consultar_reponer`; `fc` no encontró diferencias con la salida esperada. Guardé el código en el commit `5be5e80`.
 - Qué quedó pendiente: Completar la sección 3 del informe y ejecutar las demás pruebas del grupo.
 
-
+## 2026 - 11 - 12
 - Quiénes: Jerónimo Hurtado Mora, código 9038219
 - Qué hicimos: Agregué los casos de prueba de la tabla en `datos/`: el 07 (eliminar con colisiones: 5, 1014 y 2023 caen en la misma cubeta; elimina en medio de la cadena, repite una eliminación y elimina un código cuya cubeta está vacía), el 08 (bordes del índice: cubeta 0, cubeta m-1, vaciar la tabla y volver a agregar) y el 09 (eliminar con códigos no positivos, que en la tabla evitaría un índice negativo). Los tres pasan con la lista. También escribí en la sección 3 del informe final el modelo de costo, el análisis formal de eliminar en la lista y en la tabla hash (con invariante del ciclo, testigos c y k y caso esperado) y el análisis de espacio, y en la sección 4 las pruebas de corrección y cómo se mide.
 - Qué quedó pendiente: Los `.csv` de medición (`mediciones.csv` y `mediciones-crudas.csv`), que se generan con el medidor cuando estén `consultar` y `reponer` de la tabla y el envoltorio de `map`; con ellos, las tablas y gráficas de la sección 4, el contraste de la sección 5 y las conclusiones. Falta también actualizar el Makefile para compilar `proyecto_tabla` y `medidor`.
