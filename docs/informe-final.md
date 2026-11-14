@@ -430,8 +430,191 @@ estructura.
 
 ### 4.3 Resultados
 
-Pendiente: tablas de `agregar`, `consultar` y `eliminar` (en milisegundos)
-y las gráficas `xychart-beta`.
+Mediciones en `datos/mediciones.csv` (mediana de 5 repeticiones; las 5
+repeticiones de cada configuración están en `datos/mediciones-crudas.csv`). En
+todas las filas `encontrados` $= n$, así que las tres operaciones respondieron
+bien en todas las estructuras mientras se medía.
+
+Pendiente: la curva de `map`, que se agrega cuando esté `mapa.h`.
+
+**agregar (ms, mediana de las repeticiones)**
+
+| $n$ | lista | tabla $m=101$ | tabla $m \approx n$ | tabla $m \approx 2n$ | tabla, una cubeta |
+|---|---|---|---|---|---|
+| 1000 | 1.779 | 0.117 | 0.081 | 0.132 | 2.261 |
+| 2000 | 7.718 | 0.235 | 0.160 | 0.149 | 7.472 |
+| 5000 | 51.125 | 1.228 | 0.393 | 0.467 | 51.115 |
+| 10000 | 200.898 | 3.922 | 1.059 | 0.841 | 200.959 |
+| 20000 | 982.331 | 19.241 | 1.490 | 1.886 | 987.260 |
+| 40000 | 4537.718 | 118.309 | 4.086 | 3.562 | 4675.888 |
+
+**consultar (ms, mediana de las repeticiones)**
+
+| $n$ | lista | tabla $m=101$ | tabla $m \approx n$ | tabla $m \approx 2n$ | tabla, una cubeta |
+|---|---|---|---|---|---|
+| 1000 | 1.651 | 0.035 | 0.012 | 0.015 | 1.660 |
+| 2000 | 7.131 | 0.104 | 0.027 | 0.018 | 7.313 |
+| 5000 | 48.533 | 0.790 | 0.079 | 0.066 | 46.551 |
+| 10000 | 189.676 | 3.356 | 0.214 | 0.130 | 189.446 |
+| 20000 | 960.943 | 21.066 | 0.359 | 0.330 | 943.317 |
+| 40000 | 4531.000 | 128.116 | 0.978 | 0.682 | 4524.860 |
+
+**eliminar (ms, mediana de las repeticiones)**
+
+| $n$ | lista | tabla $m=101$ | tabla $m \approx n$ | tabla $m \approx 2n$ | tabla, una cubeta |
+|---|---|---|---|---|---|
+| 1000 | 0.729 | 0.070 | 0.049 | 0.068 | 0.718 |
+| 2000 | 3.776 | 0.147 | 0.094 | 0.095 | 3.683 |
+| 5000 | 25.577 | 0.748 | 0.213 | 0.245 | 26.180 |
+| 10000 | 106.270 | 2.070 | 0.504 | 0.409 | 106.109 |
+| 20000 | 518.298 | 9.913 | 0.894 | 1.048 | 517.581 |
+| 40000 | 2942.360 | 58.907 | 2.163 | 2.061 | 2906.841 |
+
+```mermaid
+xychart-beta
+  title "consultar: estructuras lentas: lista, una cubeta, m=101 (en ese orden)"
+  x-axis "n" [1000, 2000, 5000, 10000, 20000, 40000]
+  y-axis "milisegundos"
+  line [1.651, 7.131, 48.533, 189.676, 960.943, 4531.000]
+  line [1.660, 7.313, 46.551, 189.446, 943.317, 4524.860]
+  line [0.035, 0.104, 0.790, 3.356, 21.066, 128.116]
+```
+
+```mermaid
+xychart-beta
+  title "consultar: estructuras rapidas: m~n, m~2n (en ese orden)"
+  x-axis "n" [1000, 2000, 5000, 10000, 20000, 40000]
+  y-axis "milisegundos"
+  line [0.012, 0.027, 0.079, 0.214, 0.359, 0.978]
+  line [0.015, 0.018, 0.066, 0.130, 0.330, 0.682]
+```
+
+```mermaid
+xychart-beta
+  title "eliminar: estructuras lentas: lista, una cubeta, m=101 (en ese orden)"
+  x-axis "n" [1000, 2000, 5000, 10000, 20000, 40000]
+  y-axis "milisegundos"
+  line [0.729, 3.776, 25.577, 106.270, 518.298, 2942.360]
+  line [0.718, 3.683, 26.180, 106.109, 517.581, 2906.841]
+  line [0.070, 0.147, 0.748, 2.070, 9.913, 58.907]
+```
+
+```mermaid
+xychart-beta
+  title "eliminar: estructuras rapidas: m~n, m~2n (en ese orden)"
+  x-axis "n" [1000, 2000, 5000, 10000, 20000, 40000]
+  y-axis "milisegundos"
+  line [0.049, 0.094, 0.213, 0.504, 0.894, 2.163]
+  line [0.068, 0.095, 0.245, 0.409, 1.048, 2.061]
+```
+
+Las gráficas `xychart-beta` no dibujan leyenda, por eso el título de cada una
+dice el orden de sus líneas. Van separadas en estructuras lentas y rápidas
+porque, en una sola gráfica, las curvas de la tabla con $m \ge n$ quedarían
+pegadas al eje: a $n = 40000$ la lista tarda más de 4 segundos y la tabla menos
+de 1 milisegundo.
+
+## 5. Lo medido contra lo predicho
+
+Cada fase hace $n$ operaciones, así que lo medido es el costo **total** de $n$
+operaciones. Por la sección 3, eso da:
+
+| Estructura | Costo de una operación | Total de $n$ operaciones |
+|---|---|---|
+| Lista | $\Theta(n)$ | $\Theta(n^2)$ |
+| Tabla, $m \ge n$ | $O(1 + \alpha)$ con $\alpha \le 1$, es decir $O(1)$ | $\Theta(n)$ |
+| Tabla, $m = 101$ | $O(1 + n/101)$ | $\Theta(n + n^2/101)$: lineal con $n$ pequeño, cuadrático con $n$ grande |
+| Tabla, una cubeta | $\Theta(n)$, peor caso | $\Theta(n^2)$ |
+
+Una forma directa de comparar es ver cuánto se multiplica el tiempo cuando
+$n$ crece. Si el total es $\Theta(n^2)$, al pasar de $n$ a $2n$ el tiempo se
+multiplica por $4$, y al pasar de $2000$ a $5000$ (factor $2{,}5$) se
+multiplica por $2{,}5^2 = 6{,}25$. Si es $\Theta(n)$, se multiplica por $2$ y por
+$2{,}5$. Con los tiempos de `consultar`:
+
+| Paso de $n$ | Predicho $\Theta(n^2)$ | Lista | Una cubeta | Predicho $\Theta(n)$ | Tabla $m \approx n$ | Tabla $m \approx 2n$ |
+|---|---|---|---|---|---|---|
+| $1000 \to 2000$ | $4$ | $4{,}32$ | $4{,}41$ | $2$ | $2{,}25$ | $1{,}20$ |
+| $2000 \to 5000$ | $6{,}25$ | $6{,}81$ | $6{,}37$ | $2{,}5$ | $2{,}93$ | $3{,}67$ |
+| $5000 \to 10000$ | $4$ | $3{,}91$ | $4{,}07$ | $2$ | $2{,}71$ | $1{,}97$ |
+| $10000 \to 20000$ | $4$ | $5{,}07$ | $4{,}98$ | $2$ | $1{,}68$ | $2{,}54$ |
+| $20000 \to 40000$ | $4$ | $4{,}72$ | $4{,}80$ | $2$ | $2{,}72$ | $2{,}07$ |
+
+**Lo que coincide.**
+
+- *La lista es cuadrática.* Sus cocientes están cerca de $4$ (y de $6{,}25$
+  en el paso de $2000$ a $5000$), como predice $\Theta(n^2)$ para el total
+  de $n$ operaciones de costo $\Theta(n)$.
+- *La tabla con todos los códigos en una cubeta se comporta igual que la
+  lista.* Sus tiempos son casi idénticos en los seis tamaños (por ejemplo,
+  $189{,}7$ ms contra $189{,}4$ ms en `consultar` con $n = 10000$). Es el
+  peor caso $O(n)$ del teorema de la sección 3: todos los nodos están en la
+  misma cadena y la tabla es una lista con un cálculo de índice extra.
+- *La tabla con $m \ge n$ crece de forma lineal.* Sus cocientes oscilan
+  alrededor de $2$ (y de $2{,}5$), y a $n = 40000$ consultar los $40000$
+  códigos tarda menos de $1$ ms, contra $4531$ ms de la lista: más de
+  $4600$ veces más rápida. Con $m \approx 2n$ es un poco más rápida que con
+  $m \approx n$, porque las cadenas son más cortas ($\alpha \approx 1/2$).
+- *La tabla con $m = 101$ pasa de lineal a cuadrática.* Con $n = 1000$
+  ($\alpha \approx 10$) está cerca de la tabla grande, pero a medida que $n$
+  crece domina el término $n^2/101$: con $n = 40000$ ($\alpha \approx 396$)
+  tarda $128$ ms, más de cien veces lo de la tabla con $m \ge n$, aunque
+  todavía unas $35$ veces menos que la lista.
+- *Las constantes entre operaciones también coinciden.* En la lista,
+  `agregar` tarda casi lo mismo que `consultar`, y `eliminar` cerca de la
+  mitad. Agregar el artículo $k$ recorre los $k$ ya guardados para detectar
+  repetidos, en total $\sum k \approx n^2/2$; consultar visita en promedio la
+  mitad de los $n$ nodos, en total $n \cdot n/2 = n^2/2$; y al eliminar la
+  lista se va encogiendo, en total $\approx n^2/4$. Medido con
+  $n = 20000$: $982$, $961$ y $518$ ms.
+
+**Lo que no coincide, y por qué.**
+
+- *Los cocientes de la lista suben un poco con $n$ grande* ($5{,}07$ y
+  $4{,}72$ en vez de $4$). Con $n = 20000$ los nodos ocupan unos
+  $20000 \times 88 \approx 1{,}7$ MB y con $40000$, unos $3{,}5$ MB, que ya no
+  caben en la memoria caché del procesador. Mientras caben, visitar un nodo
+  cuesta pocos nanosegundos; cuando no, muchas visitas van a la memoria
+  principal, que es varias veces más lenta. El análisis asintótico cuenta
+  operaciones y supone que todas cuestan lo mismo, pero en la práctica la
+  constante oculta crece con el tamaño. Lo mismo, más marcado, le pasa a la
+  tabla con $m = 101$ (cocientes de $6$).
+- *Los cocientes de la tabla con $m \ge n$ son irregulares* ($1{,}2$ a
+  $3{,}7$). Son tiempos de menos de $1$ ms para todas las consultas juntas,
+  así que pequeñas interrupciones del sistema operativo o la resolución del
+  reloj pesan mucho en la medición. Aun así la tendencia es lineal: de
+  $n = 1000$ a $n = 40000$ el tiempo crece unas $81$ veces con $m \approx n$
+  y $45$ con $m \approx 2n$, cerca del factor $40$ de $n$ y muy lejos del
+  factor $1600$ de un costo cuadrático.
+
+## 6. Conclusiones
+
+Para el inventario conviene la **tabla hash con un número de cubetas primo y
+del orden de $n$**. Agregar, consultar, reponer y eliminar cuestan $O(1)$ en
+el caso esperado, y en los experimentos fue miles de veces más rápida que la
+lista a partir de unos pocos miles de artículos. A cambio, gasta memoria en
+las cubetas vacías ($16m$ bytes más que la lista) y `LISTAR` no sale en un
+orden útil, sino por cubeta.
+
+La respuesta cambia en estos casos:
+
+- *Si $n$ crece mucho más que $m$.* Nuestra tabla no cambia de tamaño, así
+  que $\alpha = n/m$ crece y cada operación cuesta $O(n/m)$. La tabla con
+  $m = 101$ lo mostró: con pocos artículos es casi tan buena como la grande,
+  pero con $40000$ es más de cien veces más lenta. Habría que escoger $m$
+  según el tamaño esperado del inventario o agregar redimensionamiento.
+- *Si los códigos tienen un patrón que choca con $m$.* Códigos múltiplos de
+  $m$ caen todos en la misma cubeta y la tabla se vuelve exactamente la lista,
+  como mostró el experimento de una cubeta. Usar $m$ primo reduce ese riesgo
+  con códigos reales, pero no lo elimina.
+- *Si hay que listar en orden de código.* `map` mantiene los códigos
+  ordenados y lista en $O(n)$; con la tabla habría que ordenar en cada
+  `LISTAR`.
+- *Si el inventario es muy pequeño.* Con unos cientos de artículos la lista
+  tarda menos de un milisegundo en todo, es la más simple y no gasta memoria
+  en cubetas.
+
+Pendiente: agregar la comparación con `map` cuando esté su curva.
 
 ## 5. Lo medido contra lo predicho
 
