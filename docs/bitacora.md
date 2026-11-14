@@ -20,13 +20,13 @@ hizo y qué quedó pendiente. La entrada más reciente va arriba.
 - Qué hicimos: Actualicé el Makefile para producir `proyecto_lista`, `proyecto_tabla` y `medidor`, con los objetivos `medir` y `tablas`. Corrí los experimentos (6 tamaños, 5 repeticiones, lista y tabla con m = 101, m ≈ n, m ≈ 2n y una sola cubeta) y subí `mediciones.csv` y `mediciones-crudas.csv`. Escribí en el informe final los resultados (4.3), el contraste con el análisis (5) y las conclusiones (6).
 - Qué quedó pendiente: Medir `map` cuando esté `mapa.h` y actualizar resultados y conclusiones; datos de la máquina en 4.2.
 
-## 2026 - 11 - 13 — Informe final
+## 2026 - 11 - 13
 
 - Quiénes: Paula Bonilla Leon, código 9038204.
-- Qué hicimos: Completé, con apoyo de ChatGPT/Codex, el análisis de `consultar`, `reponer`, `agregar` y `listar` en la sección 3 del informe final. Añadí las demostraciones para la lista enlazada y la tabla hash y actualicé el resumen de costos.
+- Qué hicimos: Completé el análisis de `consultar`, `reponer`, `agregar` y `listar` en la sección 3 del informe final. Añadí las demostraciones para la lista enlazada y la tabla hash y actualicé el resumen de costos.
 - Qué quedó pendiente: Subir mi rama y revisar con el grupo las pruebas integradas y las mediciones de la entrega final.
 
-## 2026 - 11 - 13 — Programación de la tabla hash
+## 2026 - 11 - 13
 
 - Quiénes: Paula Bonilla Leon, código 9038204.
 - Qué hicimos: Implementé `consultar` y `reponer` en `codigo/tablahash.cpp`. Ambas funciones verifican que la cubeta tenga productos antes de buscar en ella. Compilé la versión de tabla hash y ejecuté `03_consultar_reponer`; `fc` no encontró diferencias con la salida esperada. Guardé el código en el commit `5be5e80`.

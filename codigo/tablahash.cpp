@@ -1,5 +1,5 @@
-/* Autores: Paula Bonilla Leon	9038204, Jerónimo Hurtado Mora	9038219, Juan Manuel Paredes Betancourt	9034283
-Tabla hash del inventario con encadenamiento: cada cubeta es una Lista.
+// Autores: Paula Bonilla Leon	9038204, Jerónimo Hurtado Mora	9038219, Juan Manuel Paredes Betancourt	9034283
+/*Tabla hash del inventario con encadenamiento: cada cubeta es una Lista.
 Operaciones: indice (funcion hash), constructor, destructor, agregar, listar,
 consultar, reponer y eliminar. Las declaraciones estan en tablahash.h. */
 #include "tablahash.h"
