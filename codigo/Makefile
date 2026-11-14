@@ -1,7 +1,7 @@
 # Compilación del proyecto.
 # principal.cpp se compila una vez por estructura: sin bandera sale el programa
 # con la lista, con -DUSAR_TABLA el de la tabla hash y con -DUSAR_MAPA el de
-# std::map (solo si ya existe mapa.h, el envoltorio con las mismas firmas).
+# std::unordered_map (solo si ya existe mapa.h, el envoltorio con las mismas firmas).
 CC      = g++
 CFLAGS  = -Wall -Wextra -O2
 FUENTES = principal.cpp lista.cpp tablahash.cpp $(wildcard mapa.cpp)
@@ -24,7 +24,7 @@ proyecto_tabla: $(FUENTES) $(ENCABEZADOS)
 proyecto_mapa: $(FUENTES) $(ENCABEZADOS)
 	$(CC) $(CFLAGS) -DUSAR_MAPA $(FUENTES) -o proyecto_mapa
 
-# Programa de medicion. Si existe mapa.h (el envoltorio de std::map), medir.cpp
+# Programa de medicion. Si existe mapa.h (el envoltorio de std::unordered_map), medir.cpp
 # lo incluye solo; por eso se agrega a las dependencias con wildcard.
 medidor: medir.cpp lista.cpp tablahash.cpp $(ENCABEZADOS) $(wildcard mapa.cpp)
 	$(CC) $(CFLAGS) medir.cpp lista.cpp tablahash.cpp $(wildcard mapa.cpp) -o medidor
@@ -72,9 +72,9 @@ tablas:
 	END { split("agregar consultar eliminar", op, " "); \
 	  split("lista chica cercana grande colision mapa", se, " "); \
 	  nom["lista"] = "lista"; nom["chica"] = "tabla $$m=101$$"; nom["cercana"] = "tabla $$m \\approx n$$"; \
-	  nom["grande"] = "tabla $$m \\approx 2n$$"; nom["colision"] = "tabla, una cubeta"; nom["mapa"] = "`map`"; \
+	  nom["grande"] = "tabla $$m \\approx 2n$$"; nom["colision"] = "tabla, una cubeta"; nom["mapa"] = "`unordered_map`"; \
 	  corto["lista"] = "lista"; corto["colision"] = "una cubeta"; corto["chica"] = "m=101"; \
-	  corto["cercana"] = "m~n"; corto["grande"] = "m~2n"; corto["mapa"] = "map"; \
+	  corto["cercana"] = "m~n"; corto["grande"] = "m~2n"; corto["mapa"] = "unordered_map"; \
 	  for (o = 1; o <= 3; o++) { \
 	    print "**" op[o] " (ms, mediana de las repeticiones)**"; print ""; \
 	    f = "| $$n$$ |"; g = "|---|"; \
