@@ -616,15 +616,17 @@ al duplicar y $\approx 2{,}8$ de $2000$ a $5000$. Con los tiempos de
 
 **Lo que no coincide, y por qué.**
 
-- *Los cocientes de la lista suben un poco con $n$ grande* ($4{,}70$ y
+- - *Los cocientes de la lista suben un poco con $n$ grande* ($4{,}70$ y
   $4{,}84$ en vez de $4$). Con $n = 20000$ los nodos ocupan unos
-  $20000 \times 88 \approx 1{,}7$ MB y con $40000$, unos $3{,}5$ MB, que ya no
-  caben en la memoria caché del procesador. Mientras caben, visitar un nodo
-  cuesta pocos nanosegundos; cuando no, muchas visitas van a la memoria
-  principal, que es varias veces más lenta. El análisis asintótico cuenta
-  operaciones y supone que todas cuestan lo mismo, pero en la práctica la
-  constante oculta crece con el tamaño. Lo mismo, más marcado, le pasa a la
-  tabla con $m = 101$ (cocientes cercanos a $6$).
+  $20000 \times 88 \approx 1{,}7$ MB y con $40000$, unos $3{,}5$ MB (algo más
+  contando lo que agrega `malloc` a cada bloque). Eso ya no cabe en la caché
+  L2 de un núcleo de este procesador ($1{,}25$ MB), que es la más rápida, y
+  muchas visitas tienen que ir a la caché L3, varias veces más lenta. Mientras
+  la lista cabe en la L2, visitar un nodo cuesta muy poco; cuando no, cada
+  visita cuesta más. El análisis asintótico cuenta operaciones y supone que
+  todas cuestan lo mismo, pero en la práctica la constante oculta crece con
+  el tamaño. Lo mismo, más marcado, le pasa a la tabla con $m = 101$
+  (cocientes cercanos a $6$).
 - *`map` también crece algo más de lo predicho* ($118$ veces de $n = 1000$
   a $n = 40000$, contra unas $61$ que daría $n \log n$). Es el mismo efecto
   de la caché: los nodos del árbol están repartidos por la memoria y, cuando
