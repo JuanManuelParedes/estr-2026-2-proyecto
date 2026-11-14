@@ -100,6 +100,68 @@ Usamos la notación del avance: $v_i$ es el nodo en la posición $i$ y $c_i$ su
 código, con $v_0 = \mathrm{cabeza}$. Por convención, $v_n = \mathrm{nullptr}$
 y $v_{-1} = \mathrm{nullptr}$.
 
+### Invariantes de la lista y de la tabla hash
+
+Un invariante es una condición que debe cumplirse antes y después de cada operación.
+
+**Lista enlazada.** Sea $r$ el número de nodos de una lista, y sean
+$v_0,\ldots,v_{r-1}$ sus nodos en orden de recorrido. Si $r=0$, `cabeza`
+vale `nullptr`. Si $r>0$, `cabeza` apunta a $v_0$ y el último nodo apunta
+a `nullptr`. Cada nodo intermedio apunta al siguiente:
+
+$$
+\forall i\in\{0,\ldots,r-2\},\qquad
+v_i.\mathrm{siguiente}=v_{i+1}.
+$$
+
+En el recorrido no se repiten nodos ni códigos:
+
+$$
+\forall i,j\in\{0,\ldots,r-1\},\qquad
+i\ne j \Rightarrow
+(v_i\ne v_j \land v_i.\mathrm{codigo}\ne v_j.\mathrm{codigo}).
+$$
+
+**Tabla hash.** Cada cubeta cumple los invariantes de una lista. Si $m$
+es el número de cubetas y $k_b$ es la cantidad de productos en la cubeta $b$,
+el contador total $n$ cumple:
+
+$$
+n=\sum_{b=0}^{m-1}k_b.
+$$
+
+Si $C_b$ es el conjunto de códigos guardados en la cubeta $b$, cada código
+está ubicado en la cubeta que le corresponde por su residuo:
+
+$$
+\forall b\in\{0,\ldots,m-1\},\quad
+\forall x\in C_b,\qquad x\bmod m=b.
+$$
+
+`consultar` conserva estas condiciones porque solo lee el inventario.
+`reponer` también las conserva porque modifica únicamente la cantidad
+del producto encontrado: no cambia su código, sus enlaces ni los contadores.
+
+### Por qué usamos una tabla hash con encadenamiento
+
+La operación más frecuente del inventario es localizar un artículo por su
+código. En la lista enlazada puede ser necesario recorrer todos los nodos.
+La tabla hash calcula la cubeta con el residuo del código entre el número
+de cubetas y busca únicamente en la lista de esa cubeta. El encadenamiento
+permite guardar varios códigos distintos aunque tengan el mismo residuo.
+
+Si los códigos se reparten uniformemente entre las cubetas, consultar y
+reponer tienen un costo esperado $O(1+n/m)$, donde $n$ es el número de
+artículos y $m$ el número de cubetas. Si todos los códigos caen en la misma
+cubeta, la búsqueda puede recorrer los $n$ nodos. El espacio auxiliar de
+ambas operaciones es $O(1)$ porque usan pocas variables de tamaño fijo,
+sin copiar la lista ni reservar nodos.
+
+El encadenamiento permite almacenar códigos distintos que caen en la misma
+cubeta. Si los códigos se distribuyen uniformemente, el costo esperado de
+buscar es $O(1+n/m)$. Si todos caen en una sola cubeta, el peor caso es
+$\Theta(n)$.
+
 ### Consultar y reponer en la lista
 
 **Teorema.** `consultar` y `reponer` tienen tiempo de peor caso $O(n)$ y espacio auxiliar $O(1)$.

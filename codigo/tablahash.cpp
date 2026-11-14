@@ -84,8 +84,13 @@ void TablaHash::listar() const {
   }
 }
 
-/* Consulta el producto en su cubeta. Si está vacía, devuelve false. */
-bool TablaHash::consultar(long codigo, Producto& salida) const {
+/* Busca el codigo en su cubeta. Si lo encuentra, copia el producto en salida
+   y devuelve true. Si no lo encuentra, devuelve false y deja salida intacta.
+   Precondicion: codigo > 0 y tabla construida con al menos una cubeta.
+   Tiempo: O(1 + k_b), donde k_b es el numero de productos de esa cubeta;
+   O(n) en el peor caso y O(1 + n/m) esperado bajo reparto uniforme.
+   Espacio auxiliar: O(1); no copia la lista ni reserva nodos. */
+   bool TablaHash::consultar(long codigo, Producto& salida) const {
     const Lista& cubeta = cubetas[indice(codigo)];
     bool encontrado = false;
 
@@ -96,7 +101,12 @@ bool TablaHash::consultar(long codigo, Producto& salida) const {
     return encontrado;
 }
 
-/* Suma unidades al producto sin cambiar el número de artículos. */
+/* Busca el codigo en su cubeta y suma las unidades al producto si existe.
+   Devuelve true si actualiza la cantidad y false si el codigo no existe.
+   No agrega productos ni modifica los contadores de la tabla.
+   Precondicion: codigo > 0, cantidad > 0 y la suma debe caber en int.
+   Tiempo: O(1 + k_b), O(n) en el peor caso y O(1 + n/m) esperado
+   bajo reparto uniforme. Espacio auxiliar: O(1); no reserva nodos. */
 bool TablaHash::reponer(long codigo, int cantidad) {
     Lista& cubeta = cubetas[indice(codigo)];
     bool encontrado = false;

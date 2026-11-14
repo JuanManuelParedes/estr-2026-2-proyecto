@@ -6,6 +6,12 @@ Una entrada por sesión de trabajo, con la fecha, quién trabajó, qué se
 hizo y qué quedó pendiente. La entrada más reciente va arriba.
 
 ## 2026 - 11 - 14
+
+- Quiénes: Paula Bonilla Leon, código 9038204.
+- Qué hicimos: Actualicé mi rama con los cambios del grupo. Añadí a la sección 3 los invariantes de la lista y la tabla hash, y justifiqué el uso del encadenamiento con una cita al texto guía. Documenté las precondiciones y los costos de consultar y reponer sin cambiar su implementación.
+- Qué quedó pendiente: Subir estos ajustes y revisar su integración con el grupo.
+
+## 2026 - 11 - 14
 - Quiénes: Jerónimo Hurtado Mora, código 9038219
 - Qué hicimos: Cambié la referencia de `map` a `unordered_map`, como indicó el profesor: actualicé `mapa.h` y el Makefile, quité `02_agregar_listar.mapa.out` y volví a correr las pruebas y las mediciones. Actualicé el informe (secciones 3, 4, 5 y 6) con los nuevos resultados.
 - Qué quedó pendiente: Actualizar 4.1 cuando se corrijan los casos 02 y 06.
