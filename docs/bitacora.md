@@ -5,6 +5,11 @@ Va en `docs/`, como los informes.
 Una entrada por sesión de trabajo, con la fecha, quién trabajó, qué se
 hizo y qué quedó pendiente. La entrada más reciente va arriba.
 
+## 2026 - 11 - 14
+- Quiénes: Jerónimo Hurtado Mora, código 9038219
+- Qué hicimos: Cambié la referencia de `map` a `unordered_map`, como indicó el profesor: actualicé `mapa.h` y el Makefile, quité `02_agregar_listar.mapa.out` y volví a correr las pruebas y las mediciones. Actualicé el informe (secciones 3, 4, 5 y 6) con los nuevos resultados.
+- Qué quedó pendiente: Actualizar 4.1 cuando se corrijan los casos 02 y 06.
+
 ## 2026 - 11 - 13
 - Quiénes: Jerónimo Hurtado Mora, código 9038219
 - Qué hicimos: Agregué `mapa.h` (envoltorio de `std::map`) y volví a medir con las tres estructuras. Actualicé en el informe las pruebas (4.1), los datos de la máquina (4.2), los resultados (4.3), el contraste (5) y las conclusiones (6).

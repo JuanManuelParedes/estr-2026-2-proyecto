@@ -351,23 +351,25 @@ $$
 y $k = 1$, y con $m \le 4n$ es $O(n)$ con $c = 168$ y $k = 1$. Frente a la
 lista, la tabla gasta $16m$ bytes más: es el precio de tener cubetas vacías.
 
-Para `map`, la biblioteca estándar de g++ (libstdc++) usa un árbol
-rojo-negro: cada artículo ocupa un nodo con tres punteros y el color, más el
-par clave-producto. También es $\Theta(n)$, con una constante por artículo
-mayor que la de nuestros nodos.
+Para `unordered_map`, la biblioteca estándar de g++ (libstdc++) usa una
+tabla hash con encadenamiento, como la nuestra: cada artículo ocupa un nodo
+con un puntero al siguiente y el par clave-producto, y además guarda un
+arreglo de cubetas. A diferencia de nuestra tabla, la redimensiona sola para
+que haya al menos tantas cubetas como artículos, así que su espacio es
+$\Theta(n)$ sin tener que escoger $m$.
 
 Resumen de costos:
 
 | Operación | Desde cero | De la biblioteca | Por qué |
 |---|---|---|---|
-| Consultar y reponer, lista | $O(n)$ peor caso | $O(\log n)$ | Se busca el código y luego se copia o actualiza el producto. |
-| Consultar y reponer, tabla | $O(1+\alpha)$ esperado; $O(n)$ peor caso | $O(\log n)$ | Solo se busca en la cubeta del código. |
-| Agregar, lista | $O(n)$ peor caso | $O(\log n)$ | Se detectan códigos repetidos antes de insertar. |
-| Agregar, tabla | $O(1+\alpha)$ esperado; $O(n)$ peor caso | $O(\log n)$ | Se comprueban los duplicados en una sola cubeta. |
+| Consultar y reponer, lista | $O(n)$ peor caso | $O(1)$ promedio; $O(n)$ peor caso | Se busca el código y luego se copia o actualiza el producto. |
+| Consultar y reponer, tabla | $O(1+\alpha)$ esperado; $O(n)$ peor caso | $O(1)$ promedio; $O(n)$ peor caso | Solo se busca en la cubeta del código. |
+| Agregar, lista | $O(n)$ peor caso | $O(1)$ amortizado; $O(n)$ peor caso | Se detectan códigos repetidos antes de insertar. |
+| Agregar, tabla | $O(1+\alpha)$ esperado; $O(n)$ peor caso | $O(1)$ amortizado; $O(n)$ peor caso | Se comprueban los duplicados en una sola cubeta. |
 | Listar, lista | $\Theta(n)$ | $\Theta(n)$ | Se imprime cada producto. |
 | Listar, tabla | $\Theta(m+n)$ | $\Theta(n)$ | Se recorren todas las cubetas y se imprime cada producto. |
-| Eliminar, lista | $O(n)$ peor caso | $O(\log n)$ | La lista recorre hasta el nodo y su anterior; `map` baja por un árbol balanceado de altura $O(\log n)$. |
-| Eliminar, tabla | $O(1 + \alpha)$ esperado, $O(n)$ peor caso | $O(\log n)$ | La tabla solo recorre la cubeta del código; si todos caen en la misma cubeta, recorre todos. |
+| Eliminar, lista | $O(n)$ peor caso | $O(1)$ promedio; $O(n)$ peor caso | La lista recorre hasta el nodo y su anterior; `unordered_map` solo recorre la cubeta del código. |
+| Eliminar, tabla | $O(1 + \alpha)$ esperado, $O(n)$ peor caso | $O(1)$ promedio; $O(n)$ peor caso | La tabla solo recorre la cubeta del código; si todos caen en la misma cubeta, recorre todos. |
 | Espacio, lista | $\Theta(n)$ | $\Theta(n)$ | Un nodo por artículo. |
 | Espacio, tabla | $\Theta(n + m)$ | $\Theta(n)$ | Un nodo por artículo más el arreglo de $m$ cubetas, aunque estén vacías. |
 
@@ -377,11 +379,12 @@ Resumen de costos:
 
 Antes de medir, verificamos que las tres estructuras respondan lo mismo con la
 misma entrada. `make pruebas` corre cada caso de `datos/` con el programa de la
-lista, el de la tabla (1009 cubetas) y el de `map`. Como `LISTAR` sale en orden
-distinto en cada estructura (en la lista, del último al primero agregado; en
-la tabla, por cubeta; en `map`, ordenado por código), los casos con `LISTAR`
-tienen además un archivo `nombre.tabla.out` o `nombre.mapa.out` con la salida
-esperada de esa estructura.
+lista, el de la tabla (1009 cubetas) y el de `unordered_map`. Como `LISTAR`
+sale en orden distinto en cada estructura (en la lista, del último al primero
+agregado; en la tabla, por cubeta; en `unordered_map`, en el orden interno de
+sus nodos), un caso con `LISTAR` puede tener además un archivo
+`nombre.tabla.out` o `nombre.mapa.out` con la salida esperada de esa
+estructura.
 
 Además de los casos del avance, agregamos tres casos pensados para la tabla:
 
@@ -453,7 +456,7 @@ estructuras reciben exactamente la misma entrada:
 medimos: la lista; la tabla con $m = 101$ (tabla pequeña, $\alpha$ crece con
 $n$), con $m$ el primo $\ge n$ ($\alpha \approx 1$) y con $m$ el primo
 $\ge 2n$ ($\alpha \approx 1/2$); la tabla con todos los códigos en una cubeta;
-y `map` como referencia.
+y `unordered_map` como referencia.
 
 **Repeticiones.** Cada configuración se mide 5 veces y se reporta la mediana,
 que es menos sensible que el promedio a una repetición interrumpida por el
@@ -472,55 +475,55 @@ bien en todas las estructuras mientras se medía.
 
 **agregar (ms, mediana de las repeticiones)**
 
-| $n$ | lista | tabla $m=101$ | tabla $m \approx n$ | tabla $m \approx 2n$ | tabla, una cubeta | `map` |
+| $n$ | lista | tabla $m=101$ | tabla $m \approx n$ | tabla $m \approx 2n$ | tabla, una cubeta | `unordered_map` |
 |---|---|---|---|---|---|---|
-| 1000 | 1.753 | 0.139 | 0.088 | 0.079 | 1.722 | 0.193 |
-| 2000 | 8.442 | 0.243 | 0.198 | 0.161 | 7.768 | 0.397 |
-| 5000 | 51.926 | 1.021 | 0.417 | 0.367 | 50.203 | 1.310 |
-| 10000 | 202.097 | 4.021 | 1.056 | 0.831 | 196.520 | 2.209 |
-| 20000 | 989.795 | 20.747 | 1.671 | 1.412 | 1004.044 | 5.323 |
-| 40000 | 4663.078 | 118.577 | 3.467 | 4.836 | 4818.609 | 11.479 |
+| 1000 | 3.194 | 0.175 | 0.122 | 0.105 | 2.844 | 0.245 |
+| 2000 | 9.104 | 0.422 | 0.288 | 0.267 | 8.993 | 0.306 |
+| 5000 | 50.642 | 1.088 | 0.503 | 0.451 | 49.574 | 0.578 |
+| 10000 | 198.676 | 4.563 | 1.156 | 1.352 | 195.473 | 1.157 |
+| 20000 | 989.222 | 19.853 | 1.696 | 2.031 | 991.530 | 2.404 |
+| 40000 | 4619.468 | 117.091 | 3.523 | 3.696 | 4521.548 | 4.861 |
 
 **consultar (ms, mediana de las repeticiones)**
 
-| $n$ | lista | tabla $m=101$ | tabla $m \approx n$ | tabla $m \approx 2n$ | tabla, una cubeta | `map` |
+| $n$ | lista | tabla $m=101$ | tabla $m \approx n$ | tabla $m \approx 2n$ | tabla, una cubeta | `unordered_map` |
 |---|---|---|---|---|---|---|
-| 1000 | 1.607 | 0.043 | 0.013 | 0.010 | 1.654 | 0.066 |
-| 2000 | 7.453 | 0.115 | 0.030 | 0.022 | 7.406 | 0.148 |
-| 5000 | 49.776 | 0.719 | 0.080 | 0.050 | 48.401 | 0.600 |
-| 10000 | 202.720 | 3.324 | 0.234 | 0.152 | 197.741 | 1.249 |
-| 20000 | 951.884 | 20.115 | 0.365 | 0.281 | 973.297 | 3.051 |
-| 40000 | 4608.909 | 136.552 | 0.815 | 0.758 | 4713.208 | 7.822 |
+| 1000 | 2.514 | 0.066 | 0.020 | 0.013 | 2.366 | 0.025 |
+| 2000 | 7.444 | 0.150 | 0.058 | 0.036 | 7.257 | 0.033 |
+| 5000 | 47.889 | 0.785 | 0.094 | 0.062 | 49.059 | 0.086 |
+| 10000 | 195.788 | 3.441 | 0.273 | 0.233 | 193.963 | 0.188 |
+| 20000 | 965.879 | 20.972 | 0.390 | 0.365 | 941.165 | 0.393 |
+| 40000 | 4473.236 | 131.060 | 0.806 | 0.705 | 4480.810 | 0.881 |
 
 **eliminar (ms, mediana de las repeticiones)**
 
-| $n$ | lista | tabla $m=101$ | tabla $m \approx n$ | tabla $m \approx 2n$ | tabla, una cubeta | `map` |
+| $n$ | lista | tabla $m=101$ | tabla $m \approx n$ | tabla $m \approx 2n$ | tabla, una cubeta | `unordered_map` |
 |---|---|---|---|---|---|---|
-| 1000 | 0.719 | 0.070 | 0.051 | 0.048 | 0.714 | 0.159 |
-| 2000 | 3.898 | 0.154 | 0.103 | 0.100 | 3.712 | 0.300 |
-| 5000 | 26.636 | 0.572 | 0.219 | 0.185 | 27.364 | 0.976 |
-| 10000 | 112.153 | 2.106 | 0.511 | 0.372 | 112.320 | 1.774 |
-| 20000 | 542.659 | 10.000 | 0.857 | 0.882 | 535.382 | 4.129 |
-| 40000 | 2995.803 | 60.681 | 2.269 | 2.143 | 3087.214 | 10.344 |
+| 1000 | 0.989 | 0.111 | 0.074 | 0.062 | 0.998 | 0.099 |
+| 2000 | 3.837 | 0.192 | 0.176 | 0.163 | 3.678 | 0.122 |
+| 5000 | 27.695 | 0.682 | 0.247 | 0.229 | 26.511 | 0.264 |
+| 10000 | 113.909 | 2.197 | 0.576 | 0.769 | 110.140 | 0.732 |
+| 20000 | 534.838 | 9.809 | 0.927 | 1.086 | 523.662 | 1.210 |
+| 40000 | 2938.821 | 59.834 | 2.235 | 1.992 | 2911.146 | 2.712 |
 
 ```mermaid
 xychart-beta
   title "consultar: estructuras lentas: lista, una cubeta, m=101 (en ese orden)"
   x-axis "n" [1000, 2000, 5000, 10000, 20000, 40000]
   y-axis "milisegundos"
-  line [1.607, 7.453, 49.776, 202.720, 951.884, 4608.909]
-  line [1.654, 7.406, 48.401, 197.741, 973.297, 4713.208]
-  line [0.043, 0.115, 0.719, 3.324, 20.115, 136.552]
+  line [2.514, 7.444, 47.889, 195.788, 965.879, 4473.236]
+  line [2.366, 7.257, 49.059, 193.963, 941.165, 4480.810]
+  line [0.066, 0.150, 0.785, 3.441, 20.972, 131.060]
 ```
 
 ```mermaid
 xychart-beta
-  title "consultar: estructuras rapidas: m~n, m~2n, map (en ese orden)"
+  title "consultar: estructuras rapidas: m~n, m~2n, unordered_map (en ese orden)"
   x-axis "n" [1000, 2000, 5000, 10000, 20000, 40000]
   y-axis "milisegundos"
-  line [0.013, 0.030, 0.080, 0.234, 0.365, 0.815]
-  line [0.010, 0.022, 0.050, 0.152, 0.281, 0.758]
-  line [0.066, 0.148, 0.600, 1.249, 3.051, 7.822]
+  line [0.020, 0.058, 0.094, 0.273, 0.390, 0.806]
+  line [0.013, 0.036, 0.062, 0.233, 0.365, 0.705]
+  line [0.025, 0.033, 0.086, 0.188, 0.393, 0.881]
 ```
 
 ```mermaid
@@ -528,26 +531,26 @@ xychart-beta
   title "eliminar: estructuras lentas: lista, una cubeta, m=101 (en ese orden)"
   x-axis "n" [1000, 2000, 5000, 10000, 20000, 40000]
   y-axis "milisegundos"
-  line [0.719, 3.898, 26.636, 112.153, 542.659, 2995.803]
-  line [0.714, 3.712, 27.364, 112.320, 535.382, 3087.214]
-  line [0.070, 0.154, 0.572, 2.106, 10.000, 60.681]
+  line [0.989, 3.837, 27.695, 113.909, 534.838, 2938.821]
+  line [0.998, 3.678, 26.511, 110.140, 523.662, 2911.146]
+  line [0.111, 0.192, 0.682, 2.197, 9.809, 59.834]
 ```
 
 ```mermaid
 xychart-beta
-  title "eliminar: estructuras rapidas: m~n, m~2n, map (en ese orden)"
+  title "eliminar: estructuras rapidas: m~n, m~2n, unordered_map (en ese orden)"
   x-axis "n" [1000, 2000, 5000, 10000, 20000, 40000]
   y-axis "milisegundos"
-  line [0.051, 0.103, 0.219, 0.511, 0.857, 2.269]
-  line [0.048, 0.100, 0.185, 0.372, 0.882, 2.143]
-  line [0.159, 0.300, 0.976, 1.774, 4.129, 10.344]
+  line [0.074, 0.176, 0.247, 0.576, 0.927, 2.235]
+  line [0.062, 0.163, 0.229, 0.769, 1.086, 1.992]
+  line [0.099, 0.122, 0.264, 0.732, 1.210, 2.712]
 ```
 
 Las gráficas `xychart-beta` no dibujan leyenda, por eso el título de cada una
 dice el orden de sus líneas. Van separadas en estructuras lentas y rápidas
-porque, en una sola gráfica, las curvas de la tabla con $m \ge n$ y de `map`
-quedarían pegadas al eje: a $n = 40000$ la lista tarda más de 4 segundos en
-consultar, `map` unos 8 milisegundos y la tabla menos de 1 milisegundo.
+porque, en una sola gráfica, las curvas de la tabla con $m \ge n$ y de
+`unordered_map` quedarían pegadas al eje: a $n = 40000$ la lista tarda más de
+4 segundos en consultar, y la tabla y `unordered_map`, menos de 1 milisegundo.
 
 ## 5. Lo medido contra lo predicho
 
@@ -560,64 +563,72 @@ operaciones. Por la sección 3, eso da:
 | Tabla, $m \ge n$ | $O(1 + \alpha)$ con $\alpha \le 1$, es decir $O(1)$ | $\Theta(n)$ |
 | Tabla, $m = 101$ | $O(1 + n/101)$ | $\Theta(n + n^2/101)$: lineal con $n$ pequeño, cuadrático con $n$ grande |
 | Tabla, una cubeta | $\Theta(n)$, peor caso | $\Theta(n^2)$ |
-| `map` | $O(\log n)$, la altura del árbol rojo-negro | $\Theta(n \log n)$ |
+| `unordered_map` | $O(1)$ promedio (amortizado al agregar) | $\Theta(n)$ |
 
 Una forma directa de comparar es ver cuánto se multiplica el tiempo cuando
 $n$ crece. Si el total es $\Theta(n^2)$, al pasar de $n$ a $2n$ el tiempo se
 multiplica por $4$, y al pasar de $2000$ a $5000$ (factor $2{,}5$) por
-$2{,}5^2 = 6{,}25$. Si es $\Theta(n)$, se multiplica por $2$ y por $2{,}5$. Si
-es $\Theta(n \log n)$, por un poco más: $2 \cdot \log(2n)/\log n \approx 2{,}15$
-al duplicar y $\approx 2{,}8$ de $2000$ a $5000$. Con los tiempos de
-`consultar`:
+$2{,}5^2 = 6{,}25$. Si es $\Theta(n)$, se multiplica por $2$ y por $2{,}5$.
+Con los tiempos de `consultar`:
 
-| Paso de $n$ | Predicho $n^2$ | Lista | Una cubeta | Predicho $n$ | Tabla $m \approx n$ | Tabla $m \approx 2n$ | Predicho $n \log n$ | `map` |
-|---|---|---|---|---|---|---|---|---|
-| $1000 \to 2000$ | $4$ | $4{,}64$ | $4{,}48$ | $2$ | $2{,}31$ | $2{,}20$ | $2{,}20$ | $2{,}24$ |
-| $2000 \to 5000$ | $6{,}25$ | $6{,}68$ | $6{,}54$ | $2{,}5$ | $2{,}67$ | $2{,}27$ | $2{,}80$ | $4{,}05$ |
-| $5000 \to 10000$ | $4$ | $4{,}07$ | $4{,}09$ | $2$ | $2{,}93$ | $3{,}04$ | $2{,}16$ | $2{,}08$ |
-| $10000 \to 20000$ | $4$ | $4{,}70$ | $4{,}92$ | $2$ | $1{,}56$ | $1{,}85$ | $2{,}15$ | $2{,}44$ |
-| $20000 \to 40000$ | $4$ | $4{,}84$ | $4{,}84$ | $2$ | $2{,}23$ | $2{,}70$ | $2{,}14$ | $2{,}56$ |
+| Paso de $n$ | Predicho $n^2$ | Lista | Una cubeta | Predicho $n$ | Tabla $m \approx n$ | Tabla $m \approx 2n$ | `unordered_map` |
+|---|---|---|---|---|---|---|---|
+| $1000 \to 2000$ | $4$ | $2{,}96$ | $3{,}07$ | $2$ | $2{,}90$ | $2{,}77$ | $1{,}32$ |
+| $2000 \to 5000$ | $6{,}25$ | $6{,}43$ | $6{,}76$ | $2{,}5$ | $1{,}62$ | $1{,}72$ | $2{,}61$ |
+| $5000 \to 10000$ | $4$ | $4{,}09$ | $3{,}95$ | $2$ | $2{,}90$ | $3{,}76$ | $2{,}19$ |
+| $10000 \to 20000$ | $4$ | $4{,}93$ | $4{,}85$ | $2$ | $1{,}43$ | $1{,}57$ | $2{,}09$ |
+| $20000 \to 40000$ | $4$ | $4{,}63$ | $4{,}76$ | $2$ | $2{,}07$ | $1{,}93$ | $2{,}24$ |
 
 **Lo que coincide.**
 
-- *La lista es cuadrática.* Sus cocientes están cerca de $4$ (y de $6{,}25$
-  en el paso de $2000$ a $5000$), como predice $\Theta(n^2)$ para el total
-  de $n$ operaciones de costo $\Theta(n)$.
+- *La lista es cuadrática.* Desde $n = 2000$ sus cocientes están cerca de
+  $4$ (y de $6{,}25$ en el paso de $2000$ a $5000$), como predice
+  $\Theta(n^2)$ para el total de $n$ operaciones de costo $\Theta(n)$.
 - *La tabla con todos los códigos en una cubeta se comporta igual que la
   lista.* Sus tiempos son casi idénticos en los seis tamaños (por ejemplo,
-  $202{,}7$ ms contra $197{,}7$ ms en `consultar` con $n = 10000$). Es el
+  $195{,}8$ ms contra $194{,}0$ ms en `consultar` con $n = 10000$). Es el
   peor caso $O(n)$ del teorema de la sección 3: todos los nodos están en la
   misma cadena y la tabla es una lista con un cálculo de índice extra.
-- *La tabla con $m \ge n$ crece de forma lineal* y es la más rápida. Sus
-  cocientes oscilan alrededor de $2$, y a $n = 40000$ consultar los $40000$
-  códigos tarda menos de $1$ ms, contra $4609$ ms de la lista: más de $5600$
-  veces más rápida. Con $m \approx 2n$ es un poco más rápida que con
-  $m \approx n$, porque las cadenas son más cortas ($\alpha \approx 1/2$).
-- *`map` crece como $n \log n$.* Sus cocientes están cerca de $2{,}15$ en
-  casi todos los pasos y queda en medio de las otras dos: a $n = 40000$
-  tarda $7{,}8$ ms, unas $590$ veces menos que la lista y unas $10$ veces
-  más que la tabla con $m \ge n$. Es lo que se espera de un árbol
-  balanceado: cada búsqueda recorre unos $\log_2 40000 \approx 15$ niveles,
-  muchos menos que los $20000$ nodos promedio de la lista, pero más que los
-  uno o dos nodos de una cubeta.
-- *La tabla con $m = 101$ pasa de lineal a cuadrática.* Con $n \le 2000$
-  ($\alpha \le 20$) es incluso más rápida que `map`, pero desde $n = 5000$ la
-  supera `map`, y a $n = 40000$ ($\alpha \approx 396$) tarda $137$ ms: unas
-  $17$ veces lo de `map` y más de $160$ veces lo de la tabla con $m \ge n$.
-  Es lo que predice $O(1 + \alpha)$: si $m$ queda fijo, la tabla pierde su
-  ventaja a medida que $n$ crece.
+- *La tabla con $m \ge n$ crece de forma lineal.* Sus cocientes oscilan
+  alrededor de $2$, y a $n = 40000$ consultar los $40000$ códigos tarda
+  menos de $1$ ms, contra $4473$ ms de la lista: más de $5500$ veces más
+  rápida. Con $m \approx 2n$ es un poco más rápida que con $m \approx n$,
+  porque las cadenas son más cortas ($\alpha \approx 1/2$).
+- *`unordered_map` también es lineal y queda casi igual que nuestra tabla
+  con $m \ge n$.* Sus cocientes son los más estables de todos (cerca de $2$
+  desde $n = 2000$), y en `consultar` está entre $0{,}6$ y $1{,}3$ veces el
+  tiempo de nuestra tabla con $m \approx n$ ($0{,}88$ ms contra $0{,}81$ ms
+  con $n = 40000$). Era lo esperado: `unordered_map` es también una tabla
+  hash con encadenamiento, con $\alpha \le 1$, así que hace prácticamente el
+  mismo trabajo.
+- *La tabla con $m = 101$ pasa de lineal a cuadrática.* Con $n = 1000$
+  ($\alpha \approx 10$) está cerca de las tablas grandes, pero a medida que
+  $n$ crece domina el término $n^2/101$: con $n = 40000$
+  ($\alpha \approx 396$) tarda $131$ ms, unas $160$ veces lo de la tabla con
+  $m \ge n$ o lo de `unordered_map`, aunque todavía $34$ veces menos que la
+  lista. Es lo que predice $O(1 + \alpha)$: si $m$ queda fijo, la tabla
+  pierde su ventaja a medida que $n$ crece.
 - *Las constantes entre operaciones de la lista también coinciden.*
   `agregar` tarda casi lo mismo que `consultar`, y `eliminar` cerca de la
   mitad. Agregar el artículo $k$ recorre los $k$ ya guardados para detectar
   repetidos, en total $\sum k \approx n^2/2$; consultar visita en promedio la
   mitad de los $n$ nodos, en total $n \cdot n/2 = n^2/2$; y al eliminar la
   lista se va encogiendo, en total $\approx n^2/4$. Medido con
-  $n = 20000$: $990$, $952$ y $543$ ms.
+  $n = 20000$: $989$, $966$ y $535$ ms.
 
 **Lo que no coincide, y por qué.**
 
-- - *Los cocientes de la lista suben un poco con $n$ grande* ($4{,}70$ y
-  $4{,}84$ en vez de $4$). Con $n = 20000$ los nodos ocupan unos
+- *`agregar` en `unordered_map` es algo más lento que en nuestra tabla*
+  (con $n = 40000$, $4{,}9$ ms contra $3{,}5$ ms; con $n = 1000$, el doble).
+  Nuestra tabla reserva todas sus cubetas desde el principio, porque le
+  damos $m$ al construirla. `unordered_map` empieza con pocas cubetas y,
+  cada vez que el factor de carga pasa de $1$, reserva un arreglo más grande
+  y reubica todos los artículos. Cada redimensionamiento cuesta $O(n)$; como
+  el tamaño se duplica, repartido entre todas las inserciones sigue siendo
+  $O(1)$ amortizado, pero la constante es mayor. A cambio, no hay que saber
+  $n$ de antemano.
+- *Los cocientes de la lista suben un poco con $n$ grande* ($4{,}93$ y
+  $4{,}63$ en vez de $4$). Con $n = 20000$ los nodos ocupan unos
   $20000 \times 88 \approx 1{,}7$ MB y con $40000$, unos $3{,}5$ MB (algo más
   contando lo que agrega `malloc` a cada bloque). Eso ya no cabe en la caché
   L2 de un núcleo de este procesador ($1{,}25$ MB), que es la más rápida, y
@@ -627,44 +638,46 @@ al duplicar y $\approx 2{,}8$ de $2000$ a $5000$. Con los tiempos de
   todas cuestan lo mismo, pero en la práctica la constante oculta crece con
   el tamaño. Lo mismo, más marcado, le pasa a la tabla con $m = 101$
   (cocientes cercanos a $6$).
-- *`map` también crece algo más de lo predicho* ($118$ veces de $n = 1000$
-  a $n = 40000$, contra unas $61$ que daría $n \log n$). Es el mismo efecto
-  de la caché: los nodos del árbol están repartidos por la memoria y, cuando
-  el árbol deja de caber en la caché L2, bajar cada nivel cuesta más.
-- *Los cocientes de la tabla con $m \ge n$ son irregulares* ($1{,}6$ a
-  $3{,}0$). Son tiempos de menos de $1$ ms para todas las consultas juntas,
+- *Con $n = 1000$ los cocientes son más bajos de lo predicho* ($2{,}96$ en
+  la lista en vez de $4$). Son las mediciones más cortas de todas, y en ellas
+  pesan más los costos fijos (arrancar el proceso, que el procesador suba su
+  frecuencia, las primeras reservas de memoria). Desde $n = 2000$ los
+  cocientes ya se acercan a lo predicho.
+- *Los cocientes de la tabla con $m \ge n$ son irregulares* ($1{,}4$ a
+  $3{,}8$). Son tiempos de menos de $1$ ms para todas las consultas juntas,
   así que pequeñas interrupciones del sistema operativo o la resolución del
   reloj pesan mucho en la medición. Aun así la tendencia es lineal: de
-  $n = 1000$ a $n = 40000$ el tiempo crece unas $63$ veces con $m \approx n$
-  y $76$ con $m \approx 2n$, cerca del factor $40$ de $n$ y muy lejos del
+  $n = 1000$ a $n = 40000$ el tiempo crece unas $40$ veces con $m \approx n$
+  y $54$ con $m \approx 2n$, cerca del factor $40$ de $n$ y muy lejos del
   factor $1600$ de un costo cuadrático.
 
 ## 6. Conclusiones
 
-Para el inventario conviene la **tabla hash con un número de cubetas primo y
-del orden de $n$**. Agregar, consultar, reponer y eliminar cuestan $O(1)$ en
-el caso esperado, y en los experimentos fue miles de veces más rápida que la
-lista y unas diez veces más rápida que `map`. A cambio, gasta memoria en las
-cubetas vacías ($16m$ bytes más que la lista) y `LISTAR` no sale en un orden
-útil, sino por cubeta.
+Para el inventario conviene una **tabla hash**. Agregar, consultar, reponer y
+eliminar cuestan $O(1)$ en el caso esperado, y en los experimentos tanto
+nuestra tabla con $m$ primo y del orden de $n$ como `unordered_map` fueron
+miles de veces más rápidas que la lista a partir de unos pocos miles de
+artículos. Nuestra tabla rinde prácticamente igual que `unordered_map`, e
+incluso agrega un poco más rápido, porque no se redimensiona. A cambio, gasta
+memoria en las cubetas vacías ($16m$ bytes más que la lista), `LISTAR` no sale
+en un orden útil, y hay que escoger $m$ de antemano.
 
 La respuesta cambia en estos casos:
 
-- *Si $n$ crece mucho más que $m$.* Nuestra tabla no cambia de tamaño, así
-  que $\alpha = n/m$ crece y cada operación cuesta $O(n/m)$. La tabla con
-  $m = 101$ lo mostró: con pocos artículos le gana incluso a `map`, pero con
-  $40000$ es $17$ veces más lenta que `map`. Habría que escoger $m$ según el
-  tamaño esperado del inventario o agregar redimensionamiento. `map` no tiene
-  este problema: no hay que escoger ningún tamaño.
+- *Si no se sabe cuántos artículos va a haber.* Nuestra tabla no cambia de
+  tamaño, así que si $n$ crece mucho más que $m$, $\alpha = n/m$ crece y cada
+  operación cuesta $O(n/m)$. La tabla con $m = 101$ lo mostró: con $40000$
+  artículos fue unas $160$ veces más lenta que la de $m \approx n$. En ese
+  caso conviene `unordered_map`, que se redimensiona sola y mantiene
+  $\alpha \le 1$ a cambio de agregar un poco más lento.
 - *Si los códigos tienen un patrón que choca con $m$.* Códigos múltiplos de
   $m$ caen todos en la misma cubeta y la tabla se vuelve exactamente la lista,
   como mostró el experimento de una cubeta. Usar $m$ primo reduce ese riesgo
-  con códigos reales, pero no lo elimina. `map` garantiza $O(\log n)$ en el
-  peor caso, sin importar los códigos.
-- *Si hay que listar en orden de código.* `map` mantiene los códigos
-  ordenados y lista en $O(n)$, como se vio en el caso 02; con la tabla habría
-  que ordenar en cada `LISTAR`.
+  con códigos reales, pero no lo elimina. `unordered_map` tiene el mismo peor
+  caso $O(n)$; si hiciera falta garantizar un peor caso mejor, habría que
+  usar un árbol balanceado, como `map`, con $O(\log n)$.
+- *Si hay que listar en orden de código.* Ninguna de las dos tablas mantiene
+  orden; habría que ordenar en cada `LISTAR` o usar un árbol balanceado.
 - *Si el inventario es muy pequeño.* Con unos cientos de artículos la lista
-  tarda menos de un milisegundo en todo, es la más simple y no gasta memoria
+  tarda unos pocos milisegundos en todo, es la más simple y no gasta memoria
   en cubetas.
-
