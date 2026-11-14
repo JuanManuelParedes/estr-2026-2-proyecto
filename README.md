@@ -23,7 +23,7 @@ su nota del proyecto es 0.0.
 **Escenario escogido:** A - Inventario 
 
 - Estructura escrita desde cero: Lista Enlazada simple y Tablas Hash
-- Estructura de la biblioteca contra la que se compara: std::forward_list y std::unordered_map
+- Estructura de la biblioteca contra la que se compara: `std::unordered_map`
 
 ## Lo primero
 

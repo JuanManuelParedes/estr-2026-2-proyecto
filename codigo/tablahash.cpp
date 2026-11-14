@@ -90,7 +90,7 @@ void TablaHash::listar() const {
    Tiempo: O(1 + k_b), donde k_b es el numero de productos de esa cubeta;
    O(n) en el peor caso y O(1 + n/m) esperado bajo reparto uniforme.
    Espacio auxiliar: O(1); no copia la lista ni reserva nodos. */
-   bool TablaHash::consultar(long codigo, Producto& salida) const {
+bool TablaHash::consultar(long codigo, Producto& salida) const {
     const Lista& cubeta = cubetas[indice(codigo)];
     bool encontrado = false;
 

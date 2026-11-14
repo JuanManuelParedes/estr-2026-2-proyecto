@@ -4,6 +4,11 @@ Va en `docs/`, como los informes.
 
 Una entrada por sesión de trabajo, con la fecha, quién trabajó, qué se
 hizo y qué quedó pendiente. La entrada más reciente va arriba.
+## 2026 - 11 - 14
+
+- Quiénes: Paula Bonilla Leon, código 9038204.
+- Qué hicimos: Revise la sección 3, sus citas e invariantes. Complete la justificación de espacio auxiliar y el análisis de construcción y destrucción. Contraste la salida documentada de `REPONER` con el lector de órdenes y el caso de inventario vacío. Aclare el orden de `LISTAR` y la referencia usada en los experimentos.
+- Qué quedó pendiente: Revisar estos ajustes e integrarlos en la versión final del grupo.
 
 ## 2026 - 11 - 14
 

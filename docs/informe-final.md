@@ -11,7 +11,7 @@ El programa se comunica de manera que el usuario le otorga unas órdenes, en don
 
 Casi todas las operaciones del inventario (como consultar, reponer, eliminar e incluso agregar, que debe detectar códigos repetidos) comienzan por encontrar el artículo a partir de su código. Cuando el inventario tiene pocos artículos no hay ningún problema, sin embargo, al escalarlo con miles de artículos el costo de buscar predomina sobre todo lo demás. Por esta razón, el proyecto resuelve el mismo problema con dos estructuras: en primer lugar, una lista enlazada simple, donde buscar recorre los nodos, y en segundo lugar, una tabla hash con encadenamiento, que reparte los artículos en cubetas para buscar solo en una de ellas. Además se mide `std::unordered_map` como referencia de una implementación de la biblioteca estándar.
 
-Las dos estructuras reciben las mismas órdenes y por eso deben responder lo mismo con igual entrada, de manera que sea posible medirlas con un solo programa y así comparar sus salidas. La única diferencia esperada es el orden en que sale `listar`, que depende de la estructura y se explica en la sección de la tabla hash.
+Las dos estructuras reciben las mismas órdenes y por eso deben responder lo mismo con igual entrada, de manera que sea posible medirlas con un solo programa y así comparar sus salidas. La única diferencia esperada es el orden en que sale `listar`, que depende de la estructura y se explica en la sección 2, en el apartado sobre el orden de `LISTAR`.
 
 ## 2. Las dos estructuras
 
@@ -74,15 +74,28 @@ Por otra parte, también ayuda al diseño puesto que, como cada cubeta de la tab
 
 Es justamente por lo anterior que las precondiciones realizadas en primer lugar valen para las dos estructuras. En la tabla, "inventario no vacío" significa $n \geq 1$ para toda la tabla, no para una cubeta: una cubeta puede estar vacía aunque la tabla no lo esté.
 
-Lo único que si varía entre las estructuras es su construcción, ya que la tabla necesita el número de cubetas. 
+La construcción de la tabla requiere indicar el número de cubetas.
 
 **Casos especiales:**
 
-- Si una precondición no se cumple, la estructura no se modifica. Con el inventario vacío, `ELIMINAR`, `CONSULTAR` responden `no existe`, como está en el enunciado, en cambio `REPONER` responde `invalido`.
+- Con el inventario vacío, `CONSULTAR`, `ELIMINAR` y `REPONER` con datos válidos responden `no existe`. Con un código no positivo, `CONSULTAR` y `ELIMINAR` también responden `no existe`. En estos casos el inventario no cambia.
 
-- Para el nombre en agregar, si se pasa de 63 carácteres el programa trunca el sobrante, es decir, descarta todos los carácteres que no estén dentro de ese espacio de 63 y el resto de la palabra no afecta a las órdenes siguientes.
+- Para el nombre en agregar, si se pasa de 63 caracteres el programa trunca el sobrante, es decir, descarta todos los caracteres que no estén dentro de ese espacio de 63 y el resto de la palabra no afecta a las órdenes siguientes.
 
 - Si `AGREGAR` o `REPONER` reciben un código o una cantidad que no son positivos, la orden responde `invalido` y no modifica la estructura. La respuesta es la misma en las dos estructuras y se menciona anteriormente en la tabla.
+
+### Orden de `LISTAR`
+
+La lista imprime en orden inverso al de inserción porque cada nodo nuevo
+se coloca en la cabeza. La tabla recorre las cubetas por índice ascendente;
+dentro de cada cubeta se conserva el orden inverso de inserción de su lista.
+El contenedor de referencia, `std::unordered_map`, no garantiza un orden.
+
+Si se necesita el mismo orden en todas las estructuras, una opción es
+reunir los productos y ordenar por código antes de imprimir. Con un método
+de ordenamiento por comparación de tiempo $O(n\log n)$, se añade ese costo
+y un arreglo de $O(n)$ espacio a los recorridos originales. En la tabla
+también se conserva el costo de recorrer las $m$ cubetas.
 
 ## 3. Análisis formal de complejidad
 
@@ -119,7 +132,7 @@ En el recorrido no se repiten nodos ni códigos:
 $$
 \forall i,j\in\{0,\ldots,r-1\},\qquad
 i\ne j \Rightarrow
-(v_i\ne v_j \land v_i.\mathrm{codigo}\ne v_j.\mathrm{codigo}).
+(v_i\ne v_j \land c_i\ne c_j).
 $$
 
 **Tabla hash.** Cada cubeta cumple los invariantes de una lista. Si $m$
@@ -144,7 +157,14 @@ del producto encontrado: no cambia su código, sus enlaces ni los contadores.
 
 ### Por qué usamos una tabla hash con encadenamiento
 
-La operación más frecuente del inventario es localizar un artículo por su
+La lista enlazada fue apropiada para el avance: puede crecer nodo a nodo
+y, una vez localizado el nodo que se quiere eliminar y su anterior,
+se ajustan enlaces sin desplazar los elementos que siguen. Un arreglo
+compacto sí puede requerir desplazamientos para conservar el orden. Una
+pila o una cola tampoco ofrece como operación propia consultar por un
+código arbitrario. La sección 10.2 de CLRS describe las listas enlazadas.
+
+Varias operaciones del inventario empiezan por localizar un artículo por su
 código. En la lista enlazada puede ser necesario recorrer todos los nodos.
 La tabla hash calcula la cubeta con el residuo del código entre el número
 de cubetas y busca únicamente en la lista de esa cubeta. El encadenamiento
@@ -157,10 +177,11 @@ cubeta, la búsqueda puede recorrer los $n$ nodos. El espacio auxiliar de
 ambas operaciones es $O(1)$ porque usan pocas variables de tamaño fijo,
 sin copiar la lista ni reservar nodos.
 
-El encadenamiento permite almacenar códigos distintos que caen en la misma
-cubeta. Si los códigos se distribuyen uniformemente, el costo esperado de
-buscar es $O(1+n/m)$. Si todos caen en una sola cubeta, el peor caso es
-$\Theta(n)$.
+En el peor caso la búsqueda cuesta $\Theta(n)$: basta buscar un código
+ausente cuyo residuo corresponda a la cubeta que contiene los $n$ nodos.
+La sección 11.2 de CLRS trata las colisiones y el encadenamiento, y la
+sección 11.3, las funciones hash y el método de la división. Las cotas y
+sus testigos se expresan con la notación de la sección 3.2.
 
 ### Consultar y reponer en la lista
 
@@ -222,7 +243,7 @@ T_{H,\mathrm{agregar}}(n,m)\le H+3k_b+4+A
 \qquad \text{para } n\ge 1.
 $$
 
-**Conclusión.** Los testigos son $c=7+A$, $k=1$ para la lista y $c=7+A+H$, $k=1$ para la tabla. En la tabla, con distribución uniforme, el tiempo esperado es $O(1+\alpha)$. Una inserción exitosa añade un nodo al inventario; si el código está repetido, no se añade ninguno.
+**Conclusión.** Los testigos son $c=7+A$, $k=1$ para la lista y $c=7+A+H$, $k=1$ para la tabla. En la tabla, con distribución uniforme, el tiempo esperado es $O(1+\alpha)$. Una inserción exitosa añade un nodo al inventario; si el código está repetido, no se añade ninguno. La búsqueda, la copia y el enlace usan una cantidad fija de punteros y contadores. El nuevo nodo permanece en el inventario y se cuenta como memoria almacenada, no como espacio temporal.
 
 ### Listar en la lista y en la tabla hash
 
@@ -246,7 +267,7 @@ T_{H,\mathrm{listar}}(n,m)\le A_H+B_Hm+B_Ln
 \qquad \text{para } m+n\ge 1.
 $$
 
-**Conclusión.** Los testigos son $c=A_L+B_L$, $k=1$ para la lista y $c=A_H+B_H+B_L$, $k=1$ para la tabla, tomando $m+n$ como tamaño. Las cotas son ajustadas porque la lista visita todos sus nodos y la tabla, además, visita todas las cubetas. Una lista vacía termina en tiempo constante. Ninguna de las dos operaciones cambia el inventario.
+**Conclusión.** Los testigos son $c=A_L+B_L$, $k=1$ para la lista y $c=A_H+B_H+B_L$, $k=1$ para la tabla, tomando $m+n$ como tamaño. Las cotas son ajustadas porque la lista visita todos sus nodos y la tabla, además, visita todas las cubetas. Una lista vacía termina en tiempo constante. Ninguna de las dos operaciones cambia el inventario. Se imprime cada producto al visitarlo, sin guardar una copia del listado: la lista usa un puntero y la tabla un índice de cubeta además de ese recorrido, por lo que el espacio auxiliar es $O(1)$.
 
 ### Eliminar en la lista
 
@@ -288,7 +309,7 @@ invariantes del avance.
 **Teorema.** El tiempo de `Lista::eliminar` cumple
 $T^{L}_{\text{elim}}(n) \in O(n)$.
 
-**Demostración.** Se procede de forma directa: se cuentan las operaciones
+**Estrategia.** Se procede de forma directa: se cuentan las operaciones
 antes del ciclo, en cada iteración y después del ciclo, y el número de
 iteraciones se acota con el invariante.
 
@@ -334,7 +355,7 @@ $c$ con $h(c) = i$.
 **Teorema (peor caso).** El tiempo de `TablaHash::eliminar` cumple
 $T^{H}_{\text{elim}}(n) \in O(n)$.
 
-**Demostración.** Se procede de forma directa: se cuenta el trabajo propio de
+**Estrategia.** Se procede de forma directa: se cuenta el trabajo propio de
 la tabla, que es constante, y se le suma el costo de `Lista::eliminar` sobre
 una sola cubeta, que es el teorema anterior con $n$ cambiado por $k_b$.
 
@@ -362,7 +383,7 @@ independiente de los demás), el tiempo esperado de `TablaHash::eliminar`
 cumple $E\!\left[T^{H}_{\text{elim}}\right] \in O(1 + \alpha)$. Si además
 $m \ge n$, entonces $E\!\left[T^{H}_{\text{elim}}\right] \in O(1)$.
 
-**Demostración.** Se procede de forma directa: se acota el tamaño esperado de
+**Estrategia.** Se procede de forma directa: se acota el tamaño esperado de
 la cubeta $b$ y se usa que la cota del costo es lineal en $k_b$.
 
 *Desarrollo.* Si el código está en la tabla, la cubeta $b$ contiene ese
@@ -423,6 +444,36 @@ flowchart TB
 Al final la cubeta 5 queda con 2023 y 5, `numeroArticulos` baja de 4 a 3 y
 las demás cubetas no se tocan.
 
+### Construcción y destrucción
+
+**Teorema.** Construir una lista vacía cuesta $\Theta(1)$; destruir una
+lista de $n$ nodos, $\Theta(n+1)$. Construir la tabla cuesta $\Theta(m)$
+para $m\ge 1$; destruirla cuesta $\Theta(m+n)$.
+
+**Estrategia.** Se cuentan las inicializaciones y liberaciones. En el
+modelo de costo, inicializar una lista vacía o liberar un nodo tiene
+costo acotado por una constante.
+
+**Desarrollo.** El constructor de la lista inicializa `cabeza` y el
+contador. Su destructor recorre sus $n$ nodos y libera cada uno una vez.
+El constructor de la tabla crea $m$ listas vacías; su destructor llama al
+destructor de cada una. Si $A$ acota el trabajo fijo de la operación y
+$B$ el trabajo de cada unidad visitada, con $A,B>0$, se obtiene:
+
+$$
+T\le A+Bq\le (A+B)q \qquad (q\ge 1),
+$$
+
+donde $q=1$ para crear la lista, $q=n+1$ para destruirla, $q=m$ para
+crear la tabla y $q=m+n$ para destruirla. En el último caso se recorren
+$m$ listas y se liberan $\sum_{b=0}^{m-1}k_b=n$ nodos.
+
+**Conclusión.** Para cada cota superior sirven los testigos $c=A+B$ y
+$k=1$, con las constantes correspondientes a la operación. Las cotas
+son ajustadas porque las inicializaciones y liberaciones descritas se
+realizan efectivamente. Los recorridos usan espacio auxiliar constante;
+el arreglo de $m$ cubetas es memoria propia de la tabla.
+
 ### Análisis de espacio
 
 Sean $s_N$, $s_L$ y $s_H$ los tamaños en bytes de `Nodo`, `Lista` y
@@ -444,7 +495,7 @@ real de 12 o 13 dígitos; para eso habría que usar `long long`.
 **Teorema.** El espacio de la lista con $n \ge 1$ artículos cumple
 $S^{L}(n) \in O(n)$.
 
-**Demostración.** Se procede de forma directa: la lista guarda el objeto
+**Estrategia.** Se procede de forma directa: la lista guarda el objeto
 `Lista` y exactamente un nodo por artículo.
 
 *Desarrollo.*
@@ -459,7 +510,7 @@ $k = 1$. Como además $S^{L}(n) \ge 80n$, el espacio es $\Theta(n)$.
 **Teorema.** El espacio de la tabla con $n$ artículos y $m$ cubetas cumple
 $S^{H}(n, m) \in O(n + m)$; si $m \le 4n$, $S^{H}(n) \in O(n)$.
 
-**Demostración.** Se procede de forma directa: la tabla guarda el objeto
+**Estrategia.** Se procede de forma directa: la tabla guarda el objeto
 `TablaHash`, el arreglo de $m$ objetos `Lista` (uno por cubeta, aunque esté
 vacía) y un nodo por artículo.
 
@@ -784,7 +835,7 @@ Con los tiempos de `consultar`:
 ## 6. Conclusiones
 
 Para el inventario conviene una **tabla hash**. Agregar, consultar, reponer y
-eliminar cuestan $O(1)$ en el caso esperado, y en los experimentos tanto
+eliminar cuestan $O(1+\alpha)$ en el caso esperado bajo reparto uniforme. Si el factor de carga se mantiene acotado, ese costo es $O(1)$. En los experimentos, tanto
 nuestra tabla con $m$ primo y del orden de $n$ como `unordered_map` fueron
 miles de veces más rápidas que la lista a partir de unos pocos miles de
 artículos. Nuestra tabla rinde prácticamente igual que `unordered_map`, e
@@ -811,3 +862,13 @@ La respuesta cambia en estos casos:
 - *Si el inventario es muy pequeño.* Con unos cientos de artículos la lista
   tarda unos pocos milisegundos en todo, es la más simple y no gasta memoria
   en cubetas.
+
+## 7. Referencias y consultas
+
+- Cormen, T. H., Leiserson, C. E., Rivest, R. L. y Stein, C. (2022).
+  *Introduction to Algorithms* (4.ª ed.). MIT Press. Secciones 3.2
+  (notación asintótica), 10.2 (listas enlazadas), 11.2 (tablas hash y
+  encadenamiento) y 11.3 (funciones hash).
+  [Índice de la edición](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/11599/4e_toc.pdf).
+- Enunciado del proyecto de Estructuras de Datos 2026-2, escenario A,
+  «Inventario de una tienda»

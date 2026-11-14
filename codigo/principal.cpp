@@ -8,10 +8,11 @@ Formato de ordenes:
   CONSULTAR codigo
   REPONER codigo cantidad
   ELIMINAR codigo
-Si a una orden le faltan datos o estos no cumplen las precondiciones
-(codigo y cantidad positivos), la ignora sin escribir nada y no toca la lista.
-Con el inventario vacio, CONSULTAR, REPONER y ELIMINAR responden "no existe"
-sin llamar a la lista, que exige que no este vacia.
+Si a una orden le faltan datos, no se ejecuta esa operacion.
+AGREGAR y REPONER responden "invalido" si el codigo o cantidad no son
+positivos. CONSULTAR y ELIMINAR responden "no existe" si el codigo
+no es positivo. Si el inventario esta vacio, CONSULTAR, REPONER y ELIMINAR
+con datos validos responden "no existe" sin delegar en la estructura.
 El mismo programa sirve para las tres estructuras: el ciclo de ordenes esta en
 procesar, que es una plantilla y solo usa las operaciones de la interfaz comun
 (vacia, agregar, listar, consultar, reponer, eliminar). main construye la
