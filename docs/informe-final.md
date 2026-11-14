@@ -26,6 +26,37 @@ de forma distinta:
 - **Tabla hash con encadenamiento:** un arreglo de $m$
   cubetas, donde cada cubeta es una lista enlazada como la del avance, y el número total de artículos n de toda la tabla. La función que decide en qué cubeta va cada código se describe en la sección 3.
 
+Así se ve la lista con tres artículos. Cada nodo guarda código, nombre y
+cantidad; `agregar` inserta por la cabeza, así que el último agregado queda
+primero:
+
+```mermaid
+flowchart LR
+  L["Lista<br/>n = 3"] -- cabeza --> A["30 · pan · 4"]
+  A -- siguiente --> B["20 · leche · 2"]
+  B -- siguiente --> C["10 · arroz · 5"]
+  C -- siguiente --> N(["nullptr"])
+```
+
+Y así se ve la tabla con $m = 1009$ cubetas después de agregar, en orden, los
+códigos 5, 1014, 2023 y 6 (el caso de prueba 07). Como
+$5 \bmod 1009 = 1014 \bmod 1009 = 2023 \bmod 1009 = 5$, los tres primeros
+**chocan** en la cubeta 5 y quedan encadenados en la lista de esa cubeta, el
+último agregado primero. El 6 cae solo en la cubeta 6, y las demás cubetas
+están vacías:
+
+```mermaid
+flowchart LR
+  C0["cubeta 0"] --> N0(["nullptr"])
+  C5["cubeta 5"] -- cabeza --> A["2023 · pan · 5"]
+  A --> B["1014 · leche · 4"]
+  B --> C["5 · arroz · 3"]
+  C --> N5(["nullptr"])
+  C6["cubeta 6"] -- cabeza --> D["6 · sal · 2"]
+  D --> N6(["nullptr"])
+  C1008["cubeta 1008"] --> N1008(["nullptr"])
+```
+
 Las operaciones son las mismas en las dos estructuras:
 
 | Operación | Qué hace | Precondición |
@@ -301,15 +332,52 @@ análisis del encadenamiento en Cormen, Leiserson, Rivest y Stein,
 *Introduction to Algorithms*, 4.ª edición, MIT Press, 2022, capítulo 11,
 sección 11.2.
 
+**Traza.** Así avanza `eliminar(1014)` sobre la tabla del diagrama de la
+sección 2: `indice` da $1014 \bmod 1009 = 5$, la cubeta 5 no está vacía y la
+tabla delega en `Lista::eliminar` de esa cubeta. El código está en medio de
+la cadena, así que hace una iteración y luego reenlaza:
+
+```mermaid
+flowchart TB
+  subgraph P1["1. Inicio: anterior = nullptr, muerto = cabeza"]
+    direction LR
+    a1["2023"] --> b1["1014"] --> c1["5"] --> n1(["nullptr"])
+    m1{{"muerto"}} -.-> a1
+  end
+  subgraph P2["2. 2023 ≠ 1014: avanzan los dos punteros"]
+    direction LR
+    a2["2023"] --> b2["1014"] --> c2["5"] --> n2(["nullptr"])
+    p2{{"anterior"}} -.-> a2
+    m2{{"muerto"}} -.-> b2
+  end
+  subgraph P3["3. Encontrado: anterior→siguiente = muerto→siguiente; free(muerto)"]
+    direction LR
+    a3["2023"] --> c3["5"] --> n3(["nullptr"])
+    b3["1014 (liberado)"]
+  end
+  P1 ~~~ P2 ~~~ P3
+```
+
+Al final la cubeta 5 queda con 2023 y 5, `numeroArticulos` baja de 4 a 3 y
+las demás cubetas no se tocan.
+
 ### Análisis de espacio
 
 Sean $s_N$, $s_L$ y $s_H$ los tamaños en bytes de `Nodo`, `Lista` y
 `TablaHash`, que el compilador fija y no dependen de $n$. En la máquina de los
-experimentos, con `sizeof`: $s_N = 88$ (el `Producto` ocupa 80: 8 del código,
-64 del nombre, 4 de la cantidad y 4 de relleno; más 8 del puntero), $s_L = 16$
-y $s_H = 16$. Contamos los bytes que reserva cada estructura; el encabezado
-que `malloc` agrega a cada bloque es otra constante por nodo y no cambia las
-cotas.
+experimentos (Windows con g++ de MinGW-w64), `long` ocupa 4 bytes, y con
+`sizeof` se obtiene: $s_N = 80$ (el `Producto` ocupa 72: 4 del código, 64 del
+nombre y 4 de la cantidad; más 8 del puntero `siguiente`), $s_L = 16$ y
+$s_H = 16$. En Linux, donde `long` ocupa 8 bytes, $s_N = 88$; las cotas
+asintóticas son las mismas y solo cambian las constantes. Contamos los bytes
+que reserva cada estructura; el encabezado que `malloc` agrega a cada bloque
+es otra constante por nodo y no cambia las cotas.
+
+Que `long` sea de 4 bytes también limita los códigos a
+$2^{31} - 1 = 2\,147\,483\,647$. Alcanza para nuestras pruebas y mediciones
+(los códigos aleatorios llegan a $10^9$ y los de colisión, a
+$40000 \cdot 40009 \approx 1{,}6 \cdot 10^9$), pero no para un código de barras
+real de 12 o 13 dígitos; para eso habría que usar `long long`.
 
 **Teorema.** El espacio de la lista con $n \ge 1$ artículos cumple
 $S^{L}(n) \in O(n)$.
@@ -320,11 +388,11 @@ $S^{L}(n) \in O(n)$.
 *Desarrollo.*
 
 $$
-S^{L}(n) = s_L + s_N\, n = 16 + 88n \le 16n + 88n = 104n \quad \text{para todo } n \geq 1.
+S^{L}(n) = s_L + s_N\, n = 16 + 80n \le 16n + 80n = 96n \quad \text{para todo } n \geq 1.
 $$
 
-*Conclusión.* Por lo tanto, $S^{L}(n) \in O(n)$ con testigos $c = 104$ y
-$k = 1$. Como además $S^{L}(n) \ge 88n$, el espacio es $\Theta(n)$.
+*Conclusión.* Por lo tanto, $S^{L}(n) \in O(n)$ con testigos $c = 96$ y
+$k = 1$. Como además $S^{L}(n) \ge 80n$, el espacio es $\Theta(n)$.
 
 **Teorema.** El espacio de la tabla con $n$ artículos y $m$ cubetas cumple
 $S^{H}(n, m) \in O(n + m)$; si $m \le 4n$, $S^{H}(n) \in O(n)$.
@@ -336,7 +404,7 @@ vacía) y un nodo por artículo.
 *Desarrollo.*
 
 $$
-S^{H}(n, m) = s_H + s_L\, m + s_N\, n = 16 + 16m + 88n \le 104(n + m) \quad \text{para todo } n + m \geq 1.
+S^{H}(n, m) = s_H + s_L\, m + s_N\, n = 16 + 16m + 80n \le 96(n + m) \quad \text{para todo } n + m \geq 1.
 $$
 
 En los experimentos $m$ es 101, el primo $\ge n$ o el primo $\ge 2n$. Por el
@@ -344,11 +412,11 @@ postulado de Bertrand siempre hay un primo entre $2n$ y $4n$, así que en los
 tres casos $m \le 4n$ (para $n \ge 26$ en el caso $m = 101$), y entonces
 
 $$
-S^{H}(n) \le 16 + 16 \cdot 4n + 88n = 152n + 16 \le 168n \quad \text{para todo } n \geq 1.
+S^{H}(n) \le 16 + 16 \cdot 4n + 80n = 144n + 16 \le 160n \quad \text{para todo } n \geq 1.
 $$
 
-*Conclusión.* Por lo tanto, $S^{H}(n, m) \in O(n + m)$ con testigos $c = 104$
-y $k = 1$, y con $m \le 4n$ es $O(n)$ con $c = 168$ y $k = 1$. Frente a la
+*Conclusión.* Por lo tanto, $S^{H}(n, m) \in O(n + m)$ con testigos $c = 96$
+y $k = 1$, y con $m \le 4n$ es $O(n)$ con $c = 160$ y $k = 1$. Frente a la
 lista, la tabla gasta $16m$ bytes más: es el precio de tener cubetas vacías.
 
 Para `unordered_map`, la biblioteca estándar de g++ (libstdc++) usa una
@@ -402,16 +470,16 @@ Salida de `make pruebas`:
   OK    lista  03_consultar_reponer.in
   OK    lista  04_eliminar.in
   OK    lista  05_limite_vacio.in
-  FALLA lista  06_limite_borde.in
+  OK    lista  06_limite_borde.in
   OK    lista  07_eliminar_colisiones.in
   OK    lista  08_limite_tabla.in
   OK    lista  09_limite_eliminar.in
   OK    tabla  01_ejemplo_enunciado.in
-  FALLA tabla  02_agregar_listar.in
+  OK    tabla  02_agregar_listar.in
   OK    tabla  03_consultar_reponer.in
   OK    tabla  04_eliminar.in
   OK    tabla  05_limite_vacio.in
-  FALLA tabla  06_limite_borde.in
+  OK    tabla  06_limite_borde.in
   OK    tabla  07_eliminar_colisiones.in
   OK    tabla  08_limite_tabla.in
   OK    tabla  09_limite_eliminar.in
@@ -420,7 +488,7 @@ Salida de `make pruebas`:
   OK    mapa  03_consultar_reponer.in
   OK    mapa  04_eliminar.in
   OK    mapa  05_limite_vacio.in
-  FALLA mapa  06_limite_borde.in
+  OK    mapa  06_limite_borde.in
   OK    mapa  07_eliminar_colisiones.in
   OK    mapa  08_limite_tabla.in
   OK    mapa  09_limite_eliminar.in
@@ -629,7 +697,7 @@ Con los tiempos de `consultar`:
   $n$ de antemano.
 - *Los cocientes de la lista suben un poco con $n$ grande* ($4{,}93$ y
   $4{,}63$ en vez de $4$). Con $n = 20000$ los nodos ocupan unos
-  $20000 \times 88 \approx 1{,}7$ MB y con $40000$, unos $3{,}5$ MB (algo más
+  $20000 \times 80 = 1{,}6$ MB y con $40000$, unos $3{,}2$ MB (algo más
   contando lo que agrega `malloc` a cada bloque). Eso ya no cabe en la caché
   L2 de un núcleo de este procesador ($1{,}25$ MB), que es la más rápida, y
   muchas visitas tienen que ir a la caché L3, varias veces más lenta. Mientras
