@@ -7,6 +7,11 @@ hizo y qué quedó pendiente. La entrada más reciente va arriba.
 
 ## 2026 - 11 - 13
 - Quiénes: Jerónimo Hurtado Mora, código 9038219
+- Qué hicimos: Agregué `mapa.h` (envoltorio de `std::map`) y volví a medir con las tres estructuras. Actualicé en el informe las pruebas (4.1), los datos de la máquina (4.2), los resultados (4.3), el contraste (5) y las conclusiones (6).
+- Qué quedó pendiente: Actualizar 4.1 cuando se corrijan los casos 02 y 06.
+
+## 2026 - 11 - 13
+- Quiénes: Jerónimo Hurtado Mora, código 9038219
 - Qué hicimos: Actualicé el Makefile para producir `proyecto_lista`, `proyecto_tabla` y `medidor`, con los objetivos `medir` y `tablas`. Corrí los experimentos (6 tamaños, 5 repeticiones, lista y tabla con m = 101, m ≈ n, m ≈ 2n y una sola cubeta) y subí `mediciones.csv` y `mediciones-crudas.csv`. Escribí en el informe final los resultados (4.3), el contraste con el análisis (5) y las conclusiones (6).
 - Qué quedó pendiente: Medir `map` cuando esté `mapa.h` y actualizar resultados y conclusiones; datos de la máquina en 4.2.
 
