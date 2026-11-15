@@ -4,6 +4,12 @@ Va en `docs/`, como los informes.
 
 Una entrada por sesión de trabajo, con la fecha, quién trabajó, qué se
 hizo y qué quedó pendiente. La entrada más reciente va arriba.
+
+## 2026 - 11 - 14/15
+- Quiénes: Juan Manuel Paredes, codigo 9034283
+- Qué hicimos: Agregue los nuevos casos de prueba acordes con los cambios que se realizó en las salidas del código y corregí algunos erroes en el informe final.
+- Qué quedó pendiente: Terminar de corregir algunos errores pendientes
+
 ## 2026 - 11 - 14
 
 - Quiénes: Paula Bonilla Leon, código 9038204.
