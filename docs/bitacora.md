@@ -5,9 +5,14 @@ Va en `docs/`, como los informes.
 Una entrada por sesión de trabajo, con la fecha, quién trabajó, qué se
 hizo y qué quedó pendiente. La entrada más reciente va arriba.
 
-## 2026 - 11 - 14/15
+## 2026 - 11 - 15
 - Quiénes: Juan Manuel Paredes, codigo 9034283
-- Qué hicimos: Agregue los nuevos casos de prueba acordes con los cambios que se realizó en las salidas del código y corregí algunos erroes en el informe final.
+- Qué hicimos: Termine de corregir el informe final, y de corregir cualquier cosa que se nos haya pasado en todos los archivos necesarios.
+- Qué quedó pendiente: Nada, ya quedo completo todo.
+
+## 2026 - 11 - 15
+- Quiénes: Juan Manuel Paredes, codigo 9034283
+- Qué hicimos: Corregí algunos errores en la sección 3 del informe final.
 - Qué quedó pendiente: Terminar de corregir algunos errores pendientes
 
 ## 2026 - 11 - 14
@@ -25,7 +30,12 @@ hizo y qué quedó pendiente. La entrada más reciente va arriba.
 ## 2026 - 11 - 14
 - Quiénes: Jerónimo Hurtado Mora, código 9038219
 - Qué hicimos: Cambié la referencia de `map` a `unordered_map`, como indicó el profesor: actualicé `mapa.h` y el Makefile, quité `02_agregar_listar.mapa.out` y volví a correr las pruebas y las mediciones. Actualicé el informe (secciones 3, 4, 5 y 6) con los nuevos resultados.
-- Qué quedó pendiente: Actualizar 4.1 cuando se corrijan los casos 02 y 06.
+- Qué quedó pendiente: Actualizar 4.1 y corregir en el informe
+
+## 2026 - 11 - 14
+- Quiénes: Juan Manuel Paredes, codigo 9034283
+- Qué hicimos: Agregué los casos de prueba actualizados para poder correr las preubas correctamente.
+- Qué quedó pendiente: Actualizar 4.1 del informe y corregir lo necesario en el informe.
 
 ## 2026 - 11 - 13
 - Quiénes: Jerónimo Hurtado Mora, código 9038219
@@ -61,13 +71,13 @@ hizo y qué quedó pendiente. La entrada más reciente va arriba.
 
 ## 2026 - 11 - 12
 - Quiénes: Juan Manuel Paredes, codigo 9034283
-- Qué hicimos: Actualice tablahash.cpp y principal.cpp con los comentarios hechos por el profe e hice las partes 1 y 2 del informe final-
+- Qué hicimos: Actualice tablahash.cpp y principal.cpp con los comentarios hechos por el profe e hice las partes 1 y 2 del informe final.
 - Qué quedó pendiente: Las funciones faltantes de `tablahash.cpp`y las partes 3, 4, 5 y 6 del informe final.
 
 ## 2026 - 11 - 10
 - Quiénes: Juan Manuel Paredes, codigo 9034283
 - Qué hicimos: Comencé con la primera parte del código de la sección final, es decir, la tabla hash, realice el `tablahash.h` y agregar y listar, con el constructor, el destructor y una funcion auxiliar en `tablahash.cpp`, con sus respectivos comentarios.
-- Qué quedó pendiente: Las funciones faltantes de `tablahash.cpp`y comenzar con el informe final.
+- Qué quedó pendiente: Las funciones faltantes de `tablahash.cpp` y comenzar con el informe final.
 
 ## 2026 - 11 - 01
 - Quiénes: Jerónimo Hurtado Mora, código 9038219

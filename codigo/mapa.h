@@ -3,6 +3,8 @@
 #define MAPA_H
 
 #include "lista.h"
+#include <cstdio>
+#include <cassert>
 #include <unordered_map>
 #include <new>        // std::bad_alloc
 

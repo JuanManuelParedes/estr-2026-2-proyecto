@@ -1,4 +1,4 @@
-// Autores: Paula Bonilla Leon	9038204, Jerónimo Hurtado Mora	9038219, Juan Manuel Paredes Betancourt	9034283
+// Autores: Paula Bonilla Leon 9038204, Jerónimo Hurtado Mora	9038219, Juan Manuel Paredes Betancourt 9034283
 #ifndef TABLAHASH_H
 #define TABLAHASH_H
 
@@ -6,7 +6,7 @@
 
 /* Tabla hash con encadenamiento y clave entera (el codigo del articulo).
 Cada cubeta es una Lista del avance. Un articulo con codigo c vive en la
-cubeta indice(c) = c mod m. */
+cubeta indice(c) = c mod numeroCubetas. */
 class TablaHash {
 
   private:

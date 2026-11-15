@@ -1,4 +1,4 @@
-// Autores: Paula Bonilla Leon	9038204, Jerónimo Hurtado Mora	9038219, Juan Manuel Paredes Betancourt	9034283
+// Autores: Paula Bonilla Leon 9038204, Jerónimo Hurtado Mora 9038219, Juan Manuel Paredes Betancourt 9034283
 /*Tabla hash del inventario con encadenamiento: cada cubeta es una Lista.
 Operaciones: indice (funcion hash), constructor, destructor, agregar, listar,
 consultar, reponer y eliminar. Las declaraciones estan en tablahash.h. */
@@ -39,7 +39,7 @@ TablaHash::~TablaHash() {
 /* Agrega un articulo nuevo a la tabla. Calcula la cubeta del codigo con
 indice y delega al agregar de lista de esa cubeta, que detecta el codigo
 repetido y enlaza el nodo en cabeza. Devuelve 0 si lo agrego, 1 si el codigo
-ya estaba (sin modificar la tabla) y 2 si no se pudo reservar memoria o malloc fallo al reservar el
+ya estaba (sin modificar la tabla) y 2 si malloc fallo al reservar el
 nodo (tampoco modifica la tabla). numeroArticulos solo aumenta cuando el
 resultado es 0.
 Costo: calcular indice es O(1); el resto es el costo de Lista::agregar sobre

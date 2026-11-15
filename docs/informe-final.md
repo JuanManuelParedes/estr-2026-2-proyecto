@@ -9,7 +9,7 @@ Este inventario resuelve muchas situaciones que serían complicadas de afrontar 
 
 El programa se comunica de manera que el usuario le otorga unas órdenes, en donde debe colocar unos parámetros específicos y este responde con algunos textos de acuerdo a lo que se le haya pedido. Los detalles están en el siguiente numeral. 
 
-Casi todas las operaciones del inventario (como consultar, reponer, eliminar e incluso agregar, que debe detectar códigos repetidos) comienzan por encontrar el artículo a partir de su código. Cuando el inventario tiene pocos artículos no hay ningún problema, sin embargo, al escalarlo con miles de artículos el costo de buscar predomina sobre todo lo demás. Por esta razón, el proyecto resuelve el mismo problema con dos estructuras: en primer lugar, una lista enlazada simple, donde buscar recorre los nodos, y en segundo lugar, una tabla hash con encadenamiento, que reparte los artículos en cubetas para buscar solo en una de ellas. Además se mide `std::unordered_map` como referencia de una implementación de la biblioteca estándar.
+Casi todas las operaciones del inventario (como consultar, reponer, eliminar e incluso agregar, que debe detectar códigos repetidos) comienzan por encontrar el artículo a partir de su código. Cuando el inventario tiene pocos artículos no hay ningún problema, sin embargo, al escalarlo con miles de artículos el costo de buscar predomina sobre todo lo demás. Por esta razón, el proyecto resuelve el mismo problema con dos estructuras: en primer lugar, una lista enlazada simple, donde buscar recorre los nodos, y en segundo lugar, una tabla hash con encadenamiento, que reparte los artículos en cubetas para buscar solo en una de ellas. Además, se mide `std::unordered_map` como referencia de una implementación de la biblioteca estándar, puesto que a pesar de que el enunciado propone map como contenedor de referencia, tiene mas sentido utilizar `std::unordered_map`, que es el contenedor de la biblioteca estándar que corresponde a una tabla hash y porque no hay un orden específico para realizar las acciones. De igual manera, en las conclusiones mencionamos map como alternativa con peor caso $O(\log n)$.
 
 Las dos estructuras reciben las mismas órdenes y por eso deben responder lo mismo con igual entrada, de manera que sea posible medirlas con un solo programa y así comparar sus salidas. La única diferencia esperada es el orden en que sale `listar`, que depende de la estructura y se explica en la sección 2, en el apartado sobre el orden de `LISTAR`.
 
@@ -61,14 +61,14 @@ Las operaciones son las mismas en las dos estructuras:
 
 | Operación | Qué hace | Precondición |
 |---|---|---|
-| Agregar (id, nombre, cantidad) | Añade un producto al inventario, con su id, nombre y cantidad. Responde `ok` si se añadió, o `repetido` si el artículo ya estaba o `invalido` si se coloca una cantidad o codigo no positivos. | $\text{id} > 0$; nombre no vacío, sin espacios, de a lo sumo 63 caracteres (cabe en `char nombre[64]`); $\text{cantidad} > 0$ |
+| Agregar (id, nombre, cantidad) | Añade un producto al inventario, con su id, nombre y cantidad. Responde `ok` si se añadió, o `repetido` si el artículo ya estaba o `invalido` si se coloca una cantidad o código no positivos. | $\text{id} > 0$; nombre no vacío, sin espacios, de a lo sumo 63 caracteres (cabe en `char nombre[64]`); $\text{cantidad} > 0$ |
 | Eliminar (id) | Quita el artículo con ese id del inventario. Responde `ok` si se eliminó, o `no existe` si no estaba. | Inventario no vacío ($n \geq 1$) e $\text{id} > 0$, ya que con el inventario vacío no hay nada que quitar. |
 | Consultar (id) | Muestra el artículo con ese id: responde con su id, nombre y cantidad, o con `no existe` si no está. No modifica nada. |  Inventario no vacío ($n \geq 1$) e $\text{id} > 0$. |
-| Reponer (id, cantidad) | Aumenta la cantidad de un artículo que ya está en el inventario. Responde `ok` si se repuso, o `no existe` si el artículo no está o `invalido` si se coloca una cantidad o codigo no positivos. | Inventario no vacío ($n \geq 1$), $\text{id} > 0$ y $\text{cantidad} > 0$, puesto que con cantidad negativa reponer restaría existencias. |
+| Reponer (id, cantidad) | Aumenta la cantidad de un artículo que ya está en el inventario. Responde `ok` si se repuso, o `no existe` si el artículo no está o `invalido` si se coloca una cantidad o código no positivos. | Inventario no vacío ($n \geq 1$), $\text{id} > 0$ y $\text{cantidad} > 0$, puesto que con cantidad negativa reponer restaría existencias. |
 | Listar | Muestra todos los artículos del inventario, uno por línea. No modifica nada. | Ninguna. Con el inventario vacío no muestra nada. |
 
 Las dos estructuras, y también el envoltorio de `std::unordered_map` que se usa como referencia, ofrecen las mismas operaciones con las mismas firmas, es decir la misma interfaz. 
-Esto sucede debido a que el programa que mide los tiempos debe poder usar una u otra sin cambiar y si las interfaces fueran distintas, el programa de medición tendría que tratar cada estructura de forma diferente, y una diferencia en los tiempos podría deberse a ese código como tal y no a la estructura. Entonces, por esta razón, con una sola interfaz lo único que cambia entre una medición y otra es la estructura, y por eso las diferencias medidas pueden ser atribuidas a ella. 
+Esto sucede debido a que el programa que mide los tiempos debe poder usar una u otra sin cambiar y si las interfaces fueran distintas, el programa de medición tendría que tratar cada estructura de forma diferente, y una diferencia en los tiempos podría deberse a ese código como tal y no a la estructura. Entonces, por esta razón, con una sola interfaz lo único que cambia entre una medición y otra es la estructura, y por eso las diferencias medidas pueden ser atribuidas a ella. Una pequeña diferencia que hay entre las estructuras, es que `Lista` tiene `buscar`, que es auxiliar y no forma parte de la interfaz común, por lo que ni `principal.cpp` ni `medir.cpp` la usan.
 
 Por otra parte, también ayuda al diseño puesto que, como cada cubeta de la tabla es una lista del avance, la tabla elige la cubeta con la función hash y delega en ella la operación.
 
@@ -641,15 +641,21 @@ sale en orden distinto en cada estructura (en la lista, del último al primero
 agregado; en la tabla, por cubeta; en `unordered_map`, en el orden interno de
 sus nodos), un caso con `LISTAR` puede tener además un archivo
 `nombre.tabla.out` o `nombre.mapa.out` con la salida esperada de esa
-estructura.
+estructura. Los casos 02 y 06 pasan en unordered_map con la misma salida de la lista. No lo garantiza el estándar, ya que es el orden que produce la implementación de libstdc++ (g++ 14.2.0) con esos códigos. Con otro compilador podría necesitarse un archivo .mapa.out propio.
 
-Además de los casos del avance, agregamos tres casos pensados para la tabla:
+Los casos 01 a 06 vienen del avance y agregamos tres casos (07 a 09) pensados para la tabla:
 
-| Caso | Tipo | Qué verifica |
-|---|---|---|
-| 07 | funcional | Eliminar con colisiones: 5, 1014 y 2023 caen en la cubeta 5; elimina en medio de la cadena, repite una eliminación y elimina un código cuya cubeta está vacía aunque la tabla no lo esté. |
-| 08 | límite | Bordes del índice: 1009 (cubeta 0), 1008 (cubeta $m-1$) y 2018 (cubeta 0 otra vez); vacía la tabla, consulta y elimina sobre ella vacía y vuelve a agregar. |
-| 09 | límite | Eliminar con códigos no positivos (`0` y `-5`) con el inventario lleno: responde `no existe` sin modificar nada. En la tabla esto evita un índice negativo, porque el residuo de un número negativo es negativo. Luego elimina los dos productos y repite una eliminación. |
+| Caso | Tipo | Qué verifica | Archivos en `datos/` |
+| :--- | :--- | :--- | :--- |
+| 01 | funcional | El ejemplo oficial del enunciado. | `01_ejemplo_enunciado.in`, `01_ejemplo_enunciado.out` |
+| 02 | funcional | Agregar, código repetido y orden de `LISTAR`. | `02_agregar_listar.in`, `02_agregar_listar.out`, `02_agregar_listar.tabla.out` |
+| 03 | funcional | Consultar, reponer y códigos ausentes. | `03_consultar_reponer.in`, `03_consultar_reponer.out` |
+| 04 | funcional | Eliminar en el medio, en la cabeza y el último. | `04_eliminar.in`, `04_eliminar.out` |
+| 05 | límite | Todas las operaciones con el inventario vacío. | `05_limite_vacio.in`, `05_limite_vacio.out` |
+| 06 | límite | Un solo elemento, código repetido, cantidad 0 (responde `invalido`), código grande, vaciar y volver a llenar. | `06_limite_borde.in`, `06_limite_borde.out`, `06_limite_borde.tabla.out` |
+| 07 | funcional | Eliminar con colisiones: 5, 1014 y 2023 caen en la cubeta 5; elimina en medio de la cadena, repite una eliminación y elimina un código cuya cubeta está vacía aunque la tabla no lo esté. | `07_eliminar_colisiones.in`, `07_eliminar_colisiones.out` |
+| 08 | límite | Bordes del índice: 1009 (cubeta 0), 1008 (cubeta $m - 1$) y 2018 (cubeta 0 otra vez); vacía la tabla, consulta y elimina sobre ella vacía y vuelve a agregar. | `08_limite_tabla.in`, `08_limite_tabla.out` |
+| 09 | límite | Eliminar con códigos no positivos (`0` y `-5`) con el inventario lleno: responde `no existe` sin modificar nada. En la tabla esto evita un índice negativo, porque el residuo de un número negativo es negativo. Luego elimina los dos productos y repite una eliminación. | `09_limite_eliminar.in`, `09_limite_eliminar.out` |
 
 Salida de `make pruebas`:
 
@@ -682,6 +688,7 @@ Salida de `make pruebas`:
   OK    mapa  08_limite_tabla.in
   OK    mapa  09_limite_eliminar.in
 ```
+**Importante:** En el avance, AGREGAR y REPONER con código o cantidad no positivos no escribían nada. Para esta entrega final decidimos responder invalido, porque el enunciado solo define ok, repetido y no existe y una orden que no responde deja al usuario sin saber qué pasó. Por eso la salida esperada del caso 06 cambió respecto al avance.
 
 ### 4.2 Cómo se midió
 
@@ -859,9 +866,9 @@ Con los tiempos de `consultar`:
   hash con encadenamiento, con $\alpha \le 1$, así que hace prácticamente el
   mismo trabajo.
 - *La tabla con $m = 101$ pasa de lineal a cuadrática.* Con $n = 1000$
-  ($\alpha \approx 10$) está cerca de las tablas grandes, pero a medida que
-  $n$ crece domina el término $n^2/101$: con $n = 40000$
-  ($\alpha \approx 396$) tarda $131$ ms, unas $160$ veces lo de la tabla con
+  ($\alpha \approx 10$) todavía es del mismo orden de magnitud que las tablas grandes 
+  (de 3 a 5 veces más lenta), pero a medida que $n$ crece domina el término $n^2/101$: 
+  con $n = 40000$ ($\alpha \approx 396$) tarda $131$ ms, unas $160$ veces lo de la tabla con
   $m \ge n$ o lo de `unordered_map`, aunque todavía $34$ veces menos que la
   lista. Es lo que predice $O(1 + \alpha)$: si $m$ queda fijo, la tabla
   pierde su ventaja a medida que $n$ crece.
@@ -913,8 +920,7 @@ Con los tiempos de `consultar`:
 Para el inventario conviene una **tabla hash**. Agregar, consultar, reponer y
 eliminar cuestan $O(1+\alpha)$ en el caso esperado bajo reparto uniforme. Si el factor de carga se mantiene acotado, ese costo es $O(1)$. En los experimentos, tanto
 nuestra tabla con $m$ primo y del orden de $n$ como `unordered_map` fueron
-miles de veces más rápidas que la lista a partir de unos pocos miles de
-artículos. Nuestra tabla rinde prácticamente igual que `unordered_map`, e
+cientos de veces más rápidas que la lista con $n=5000$ (unas 500 veces al consultar) y más de $5000$ veces más rápidas con $n=40000$. Nuestra tabla rinde prácticamente igual que `unordered_map`, e
 incluso agrega un poco más rápido, porque no se redimensiona. A cambio, gasta
 memoria en las cubetas vacías ($16m$ bytes más que la lista), `LISTAR` no sale
 en un orden útil, y hay que escoger $m$ de antemano.
@@ -946,5 +952,15 @@ La respuesta cambia en estos casos:
   (notación asintótica), 10.2 (listas enlazadas), 11.2 (tablas hash y
   encadenamiento) y 11.3 (funciones hash).
   [Índice de la edición](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/11599/4e_toc.pdf).
+- Cppreference. (s. f.). *std::unordered_map*. https://en.cppreference.com/w/cpp/container/unordered_map
+- GitHub Docs. (s. f.). *Sintaxis básica de escritura y formato en GitHub*.
+  https://docs.github.com/es/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax
+- GitHub Docs. (s. f.). *Escritura de expresiones matemáticas*.
+  https://docs.github.com/es/get-started/writing-on-github/working-with-advanced-formatting/writing-mathematical-expressions
+- GitHub Docs. (s. f.). *Creating diagrams*.
+  https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams
 - Enunciado del proyecto de Estructuras de Datos 2026-2, escenario A,
-  «Inventario de una tienda»
+  «Inventario de una tienda».
+- Se usó asistentes de IA (Claude y Codex) para revisar el informe y el código y
+  para contrastar las cuentas del análisis; el modelado, las decisiones, las
+  mediciones y las demostraciones son del grupo.
